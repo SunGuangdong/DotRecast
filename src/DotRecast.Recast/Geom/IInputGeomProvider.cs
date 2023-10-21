@@ -24,22 +24,67 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast.Geom
 {
+    /// <summary>
+    /// 接口定义了一个输入几何提供器（Input Geometry Provider），它用于从三角形网格数据中创建导航网格。
+    /// </summary>
     public interface IInputGeomProvider
     {
+        /// <summary>
+        /// 返回一个RcTriMesh实例，表示三角形网格数据。
+        /// </summary>
+        /// <returns></returns>
         RcTriMesh GetMesh();
+        /// <summary>
+        /// 返回三角形网格的最小边界
+        /// </summary>
+        /// <returns></returns>
         RcVec3f GetMeshBoundsMin();
 
+        /// <summary>
+        /// 返回三角形网格的最大边界
+        /// </summary>
+        /// <returns></returns>
         RcVec3f GetMeshBoundsMax();
 
+        /// <summary>
+        /// 返回一个包含RcTriMesh实例的可枚举集合
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<RcTriMesh> Meshes();
         
         // convex volume
+        /// <summary>
+        /// 向凸体区域列表中添加一个已经创建好的RcConvexVolume实例
+        /// </summary>
+        /// <param name="convexVolume"></param>
         void AddConvexVolume(RcConvexVolume convexVolume);
+        
+        /// <summary>
+        /// 返回一个包含RcConvexVolume实例的列表，表示凸体区域。
+        /// </summary>
+        /// <returns></returns>
         IList<RcConvexVolume> ConvexVolumes();
 
         // off mesh connections
+        /// <summary>
+        /// 返回一个包含RcOffMeshConnection实例的列表，表示离网连接。
+        /// </summary>
+        /// <returns></returns>
         public List<RcOffMeshConnection> GetOffMeshConnections();
+        /// <summary>
+        /// 根据给定的起点、终点、半径、双向标志、区域ID和标志，向离网连接列表中添加一个新的RcOffMeshConnection实例。
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="radius"></param>
+        /// <param name="bidir"></param>
+        /// <param name="area"></param>
+        /// <param name="flags"></param>
         public void AddOffMeshConnection(RcVec3f start, RcVec3f end, float radius, bool bidir, int area, int flags);
+        /// <summary>
+        /// 根据给定的条件过滤器（Predicate），从离网连接列表中移除满足条件的离网连接。
+        /// </summary>
+        /// <param name="filter"></param>
         public void RemoveOffMeshConnections(Predicate<RcOffMeshConnection> filter);
 
     }

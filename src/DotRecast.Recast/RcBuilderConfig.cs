@@ -22,8 +22,19 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast
 {
+    /// <summary>
+    /// 是一个用于存储导航网格构建配置的类。
+    /// </summary>
     public class RcBuilderConfig
     {
+        /*
+         *  cfg：导航网格的配置（RcConfig）。
+            tileX和tileZ：瓦片在网格中的坐标（X和Z轴）。
+            width：沿x轴的字段宽度。[限制：>= 0] [单位：vx]。
+            height：沿z轴的字段高度。[限制：>= 0] [单位：vx]。
+            bmin：字段轴对齐边界框（AABB）的最小边界。[(x, y, z)] [单位：wu]。
+            bmax：字段轴对齐边界框（AABB）的最大边界。[(x, y, z)] [单位：wu]。
+         */
         public readonly RcConfig cfg;
 
         public readonly int tileX;
@@ -41,10 +52,12 @@ namespace DotRecast.Recast
         /** The maximum bounds of the field's AABB. [(x, y, z)] [Units: wu] **/
         public readonly RcVec3f bmax = new RcVec3f();
 
+        // 构造函数：接受导航网格配置、最小边界和最大边界作为参数。这个构造函数将瓦片坐标设置为0。
         public RcBuilderConfig(RcConfig cfg, RcVec3f bmin, RcVec3f bmax) : this(cfg, bmin, bmax, 0, 0)
         {
         }
-
+        
+        // 构造函数：接受导航网格配置、最小边界、最大边界和瓦片坐标作为参数。 
         public RcBuilderConfig(RcConfig cfg, RcVec3f bmin, RcVec3f bmax, int tileX, int tileZ)
         {
             this.tileX = tileX;
@@ -52,6 +65,8 @@ namespace DotRecast.Recast
             this.cfg = cfg;
             this.bmin = bmin;
             this.bmax = bmax;
+            // 根据配置中的UseTiles属性，计算实际需要的几何数据边界（bmin和bmax）以及网格的宽度和高度。
+            // 这些信息可用于查询输入几何数据，以确保导航网格瓦片在边界处正确连接，以及边界附近的障碍物与膨胀过程正确工作。
             if (cfg.UseTiles)
             {
                 float tsx = cfg.TileSizeX * cfg.Cs;
@@ -82,6 +97,27 @@ namespace DotRecast.Recast
                 // For example if you build a navmesh for terrain, and want the navmesh tiles to match the terrain tile size
                 // you will need to pass in data from neighbour terrain tiles too! In a simple case, just pass in all the 8 neighbours,
                 // or use the bounding box below to only pass in a sliver of each of the 8 neighbours.
+                
+                
+                // 按边界大小扩展高度场边界框，以找到构建此图块所需的几何图形范围。
+                //
+                // 这样做是为了确保导航网格图块在边界处正确连接，靠近边界的障碍物可以在膨胀过程中正常工作。
+                // 不会在边界区域上创建多边形（或轮廓）。
+                //
+                // 重要的！
+                //
+                // :''''''''':
+                // : +-----+ :
+                // : |     | :
+                // : |     |<--- 平铺构建
+                // : |     | :
+                // : +-----+ :<-- 需要几何形状
+                // :.........:
+                //
+                // 您应该使用此边界框来查询您的输入几何图形。
+                //
+                // 例如，如果您为地形构建导航网格，并希望导航网格图块匹配地形图块大小您还需要传递来自相邻地形图块的数据！ 在一个简单的情况下，只需传入所有 8 个邻居，
+                // 或使用下面的边界框仅传入 8 个邻居中每一个的一小部分。
                 
                 this.bmin.x -= cfg.BorderSize * cfg.Cs;
                 this.bmin.z -= cfg.BorderSize * cfg.Cs;

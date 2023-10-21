@@ -24,12 +24,24 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast.Geom
 {
+    /// <summary>
+    /// 这个类表示一个 分块三角形网格（Chunky Triangle Mesh），
+    /// 它的主要作用是对三角形网格进行空间分割，以便更高效地进行空间查询。
+    /// </summary>
     public class RcChunkyTriMesh
     {
         private List<RcChunkyTriMeshNode> nodes;
         private int ntris;
         private int maxTrisPerChunk;
 
+        /// <summary>
+        /// 计算给定范围内物体的边界框（bounding box），并将结果存储在bmin和bmax中。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="imin"></param>
+        /// <param name="imax"></param>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
         private void CalcExtends(BoundsItem[] items, int imin, int imax, ref RcVec2f bmin, ref RcVec2f bmax)
         {
             bmin.x = items[imin].bmin.x;
@@ -63,11 +75,27 @@ namespace DotRecast.Recast.Geom
             }
         }
 
+        /// <summary>
+        /// 计算两个给定值中的最长轴，返回0表示x轴，返回1表示y轴。
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private int LongestAxis(float x, float y)
         {
             return y > x ? 1 : 0;
         }
 
+        /// <summary>
+        /// 将给定范围内的物体递归地进行空间划分，直到每个子区域内的三角形数量小于等于trisPerChunk。
+        /// 这个函数使用了一种基于边界框的分割策略，首先计算物体边界框的最长轴，然后沿着这个轴将物体分为两部分。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="imin"></param>
+        /// <param name="imax"></param>
+        /// <param name="trisPerChunk"></param>
+        /// <param name="nodes"></param>
+        /// <param name="inTris"></param>
         private void Subdivide(BoundsItem[] items, int imin, int imax, int trisPerChunk, List<RcChunkyTriMeshNode> nodes, int[] inTris)
         {
             int inum = imax - imin;
@@ -123,6 +151,13 @@ namespace DotRecast.Recast.Geom
             }
         }
 
+        /// <summary>
+        /// 构造函数：接收顶点数组、三角形数组、三角形数量和每个分块内的最大三角形数量作为参数，然后根据这些参数构建分块三角形网格。
+        /// </summary>
+        /// <param name="verts"></param>
+        /// <param name="tris"></param>
+        /// <param name="ntris"></param>
+        /// <param name="trisPerChunk"></param>
         public RcChunkyTriMesh(float[] verts, int[] tris, int ntris, int trisPerChunk)
         {
             int nchunks = (ntris + trisPerChunk - 1) / trisPerChunk;
@@ -185,6 +220,14 @@ namespace DotRecast.Recast.Geom
             }
         }
 
+        /// <summary>
+        /// 检查给定的两个矩形是否相交。
+        /// </summary>
+        /// <param name="amin"></param>
+        /// <param name="amax"></param>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
+        /// <returns></returns>
         private bool CheckOverlapRect(float[] amin, float[] amax, RcVec2f bmin, RcVec2f bmax)
         {
             bool overlap = true;
@@ -193,6 +236,12 @@ namespace DotRecast.Recast.Geom
             return overlap;
         }
 
+        /// <summary>
+        /// 获取与给定矩形相交的所有分块。
+        /// </summary>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
+        /// <returns></returns>
         public List<RcChunkyTriMeshNode> GetChunksOverlappingRect(float[] bmin, float[] bmax)
         {
             // Traverse tree
@@ -222,6 +271,12 @@ namespace DotRecast.Recast.Geom
             return ids;
         }
 
+        /// <summary>
+        /// 获取与给定线段相交的所有分块。
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="q"></param>
+        /// <returns></returns>
         public List<RcChunkyTriMeshNode> GetChunksOverlappingSegment(float[] p, float[] q)
         {
             // Traverse tree
@@ -251,6 +306,15 @@ namespace DotRecast.Recast.Geom
             return ids;
         }
 
+        /// <summary>
+        /// 检查给定的线段是否与给定的矩形相交。
+        /// 这个函数使用了一种基于射线-平面相交的算法，首先计算线段与矩形的每个平面的相交参数t值，然后判断这些t值是否在有效范围内。
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="q"></param>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
+        /// <returns></returns>
         private bool CheckOverlapSegment(float[] p, float[] q, RcVec2f bmin, RcVec2f bmax)
         {
             float EPSILON = 1e-6f;

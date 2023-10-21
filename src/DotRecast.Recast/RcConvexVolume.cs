@@ -20,11 +20,17 @@ freely, subject to the following restrictions:
 
 namespace DotRecast.Recast
 {
+    // 是一个表示凸体空间的类。凸体空间在导航网格生成过程中用于定义特殊区域，例如禁止通行区域或者具有特殊属性的区域。
+    // 类主要用于在导航网格生成过程中定义特殊区域，以便在寻路时考虑这些区域的属性。
     public class RcConvexVolume
     {
+        // 表示凸体空间顶点的数组。顶点坐标按x, y, z顺序存储，每3个元素表示一个顶点。
         public float[] verts;
+        // 表示凸体空间在y轴方向上的最小高度
         public float hmin;
+        // 表示凸体空间在y轴方向上的最大高度
         public float hmax;
+        // 表示凸体空间的区域修改类型。这个类型用于指定凸体空间对应的导航网格区域的属性，例如禁止通行、行走缓慢等
         public RcAreaModification areaMod;
     }
 }

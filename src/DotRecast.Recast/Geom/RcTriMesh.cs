@@ -22,10 +22,23 @@ using System.Collections.Generic;
 
 namespace DotRecast.Recast.Geom
 {
+    /// <summary>
+    /// 表示一个三角形网格（Triangle Mesh），它包含了一个三角形网格的顶点和面信息，
+    /// 以及一个分块三角形网格（Chunky Triangle Mesh）实例，用于加速空间查询。
+    /// </summary>
     public class RcTriMesh
     {
+        /// <summary>
+        /// 表示三角形网格的顶点坐标，是一个浮点数数组。数组中每三个元素表示一个顶点的x、y、z坐标。
+        /// </summary>
         private readonly float[] vertices;
+        /// <summary>
+        /// 表示三角形网格的面信息，是一个整数数组。数组中每三个元素表示一个三角形面的三个顶点索引。
+        /// </summary>
         private readonly int[] faces;
+        /// <summary>
+        /// 表示一个分块三角形网格实例，用于加速对三角形网格的空间查询。
+        /// </summary>
         public readonly RcChunkyTriMesh chunkyTriMesh;
 
         public RcTriMesh(float[] vertices, int[] faces)
@@ -45,6 +58,13 @@ namespace DotRecast.Recast.Geom
             return vertices;
         }
 
+        /// <summary>
+        /// 根据给定的矩形边界，查询与矩形相交的分块三角形网格中的所有分块。
+        /// 这个方法通过调用chunkyTriMesh实例的GetChunksOverlappingRect方法实现。
+        /// </summary>
+        /// <param name="bmin"></param>
+        /// <param name="bmax"></param>
+        /// <returns></returns>
         public List<RcChunkyTriMeshNode> GetChunksOverlappingRect(float[] bmin, float[] bmax)
         {
             return chunkyTriMesh.GetChunksOverlappingRect(bmin, bmax);

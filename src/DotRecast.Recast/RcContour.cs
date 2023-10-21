@@ -21,24 +21,32 @@ freely, subject to the following restrictions:
 namespace DotRecast.Recast
 {
     /** Represents a simple, non-overlapping contour in field space. */
+    // 表示场景空间中的一个简单、非重叠轮廓。在导航网格构建过程中，轮廓用于表示连通区域的边界。
+    // 这个类的主要目的是在导航网格构建过程中表示非重叠轮廓，以便在后续步骤中正确处理连通区域的边界。轮廓通常用于生成导航网格的边界多边形，从而生成最终的导航网格。
     public class RcContour
     {
         /** Simplified contour vertex and connection data. [Size: 4 * #nverts] */
+        // 简化轮廓的顶点和连接数据。[大小：4 * #nverts]
         public int[] verts;
 
         /** The number of vertices in the simplified contour. */
+        // 简化轮廓中的顶点数量。
         public int nverts;
 
         /** Raw contour vertex and connection data. [Size: 4 * #nrverts] */
+        // 原始轮廓的顶点和连接数据。[大小：4 * #nrverts]
         public int[] rverts;
 
         /** The number of vertices in the raw contour. */
+        // 原始轮廓中的顶点数量
         public int nrverts;
 
         /** The region id of the contour. */
+        // 轮廓的区域ID
         public int area;
 
         /** The area id of the contour. */
+        // 轮廓的区域ID
         public int reg;
     }
 }

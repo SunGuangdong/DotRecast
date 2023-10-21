@@ -24,17 +24,46 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast.Geom
 {
+    /// <summary>
+    /// 这个类表示一个简单的输入几何提供器（Simple Input Geometry Provider），它实现了IInputGeomProvider接口，用于从三角形网格数据中创建导航网格。
+    /// </summary>
     public class SimpleInputGeomProvider : IInputGeomProvider
     {
+        /// <summary>
+        /// 表示三角形网格的顶点坐标，是一个浮点数数组。数组中每三个元素表示一个顶点的x、y、z坐标。
+        /// </summary>
         public readonly float[] vertices;
+        /// <summary>
+        /// 表示三角形网格的面信息，是一个整数数组。数组中每三个元素表示一个三角形面的三个顶点索引。
+        /// </summary>
         public readonly int[] faces;
+        /// <summary>
+        /// 表示三角形网格的法向量，是一个浮点数数组。数组中每三个元素表示一个三角形面的法向量。
+        /// </summary>
         public readonly float[] normals;
+        /// <summary>
+        /// 表示三角形网格的最小边界 
+        /// </summary>
         private RcVec3f bmin;
+        /// <summary>
+        /// 表示三角形网格的最大边界 
+        /// </summary>
         private RcVec3f bmax;
 
+        /// <summary>
+        /// 表示一个RcConvexVolume类型的列表，用于存储凸体区域。
+        /// </summary>
         private readonly List<RcConvexVolume> volumes = new List<RcConvexVolume>();
+        /// <summary>
+        /// 表示一个RcTriMesh类型的实例，用于存储三角形网格数据。
+        /// </summary>
         private readonly RcTriMesh _mesh;
 
+        /// <summary>
+        /// 从给定的.obj文件路径中加载三角形网格数据，并返回一个SimpleInputGeomProvider实例。
+        /// </summary>
+        /// <param name="objFilePath"></param>
+        /// <returns></returns>
         public static SimpleInputGeomProvider LoadFile(string objFilePath)
         {
             byte[] chunk = RcResources.Load(objFilePath);
@@ -42,11 +71,21 @@ namespace DotRecast.Recast.Geom
             return new SimpleInputGeomProvider(context.vertexPositions, context.meshFaces);
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="vertexPositions"></param>
+        /// <param name="meshFaces"></param>
         public SimpleInputGeomProvider(List<float> vertexPositions, List<int> meshFaces)
             : this(MapVertices(vertexPositions), MapFaces(meshFaces))
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="meshFaces"></param>
+        /// <returns></returns>
         private static int[] MapFaces(List<int> meshFaces)
         {
             int[] faces = new int[meshFaces.Count];
@@ -58,6 +97,7 @@ namespace DotRecast.Recast.Geom
             return faces;
         }
 
+        
         private static float[] MapVertices(List<float> vertexPositions)
         {
             float[] vertices = new float[vertexPositions.Count];
@@ -69,6 +109,11 @@ namespace DotRecast.Recast.Geom
             return vertices;
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="faces"></param>
         public SimpleInputGeomProvider(float[] vertices, int[] faces)
         {
             this.vertices = vertices;
@@ -108,6 +153,14 @@ namespace DotRecast.Recast.Geom
             return volumes;
         }
 
+        
+        /// <summary>
+        /// 根据给定的顶点、高度、区域等信息，向凸体区域列表中添加一个新的RcConvexVolume实例。
+        /// </summary>
+        /// <param name="verts"></param>
+        /// <param name="minh"></param>
+        /// <param name="maxh"></param>
+        /// <param name="areaMod"></param>
         public void AddConvexVolume(float[] verts, float minh, float maxh, RcAreaModification areaMod)
         {
             RcConvexVolume vol = new RcConvexVolume();
@@ -117,6 +170,10 @@ namespace DotRecast.Recast.Geom
             vol.areaMod = areaMod;
         }
 
+        /// <summary>
+        /// 向凸体区域列表中添加一个已经创建好的RcConvexVolume实例
+        /// </summary>
+        /// <param name="convexVolume"></param>
         public void AddConvexVolume(RcConvexVolume convexVolume)
         {
             volumes.Add(convexVolume);
@@ -142,6 +199,9 @@ namespace DotRecast.Recast.Geom
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 计算三角形网格的法向量。这个方法使用了叉积（cross product）计算法向量，并对法向量进行归一化处理。
+        /// </summary>
         public void CalculateNormals()
         {
             for (int i = 0; i < faces.Length; i += 3)

@@ -21,12 +21,16 @@ freely, subject to the following restrictions:
 namespace DotRecast.Recast
 {
     /** Provides information on the content of a cell column in a compact heightfield. */
+    // 提供有关紧凑高度字段中单元格列内容的信息。
+    // 紧凑高度场是一种在导航网格构建过程中使用的数据结构，用于表示场景的三维空间信息。
     public readonly struct RcCompactCell
     {
         /** Index to the first span in the column. */
+        // 指向列中第一个跨度的索引
         public readonly int index;
 
         /** Number of spans in the column. */
+        // 列中跨度的数量
         public readonly int count;
 
         public RcCompactCell(int index, int count)
