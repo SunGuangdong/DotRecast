@@ -22,11 +22,29 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast
 {
+    /// <summary>
+    /// 提供了在多边形网格（poly mesh）和多边形网格细节（poly mesh detail）中进行射线投射的方法。
+    /// 射线投射在导航网格中的应用包括检查两个点之间是否有遮挡物，以及寻找最近的可见点等。
+    ///
+    /// 这个类提供了在导航网格中进行射线投射的方法，可以用于检查两个点之间的可见性，以及寻找最近的可见点等。这些功能在寻路和避障等场景中非常有用。
+    /// </summary>
     public static class RcPolyMeshRaycast
     {
+        /// <summary>
+        /// 这是一个公共静态方法，用于在一组构建结果（RcBuilderResult）中进行射线投射。
+        /// 方法接受一个 RcBuilderResult 列表，一个源点 src 和一个目标点 dst。
+        /// 方法返回一个布尔值，表示射线是否与网格相交；hitTime 输出参数表示相交点在射线上的时间参数。
+        /// </summary>
+        /// <param name="results"></param>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
+        /// <param name="hitTime"></param>
+        /// <returns></returns>
         public static bool Raycast(IList<RcBuilderResult> results, RcVec3f src, RcVec3f dst, out float hitTime)
         {
             hitTime = 0.0f;
+            //方法遍历所有构建结果，对于每一个包含多边形网格细节（RcPolyMeshDetail）的结果，调用 Raycast 私有方法进行射线投射。
+            //如果射线与任何一个网格相交，方法返回 true，否则返回 false。
             foreach (RcBuilderResult result in results)
             {
                 if (result.GetMeshDetail() != null)
@@ -41,11 +59,25 @@ namespace DotRecast.Recast
             return false;
         }
 
+        /// <summary>
+        /// 用于在给定的多边形网格（RcPolyMesh）和多边形网格细节（RcPolyMeshDetail）中进行射线投射。
+        /// 方法接受一个多边形网格 poly，一个多边形网格细节 meshDetail，一个源点 sp 和一个目标点 sq。
+        /// 方法返回一个布尔值，表示射线是否与网格相交；hitTime 输出参数表示相交点在射线上的时间参数。
+        /// </summary>
+        /// <param name="poly"></param>
+        /// <param name="meshDetail"></param>
+        /// <param name="sp"></param>
+        /// <param name="sq"></param>
+        /// <param name="hitTime"></param>
+        /// <returns></returns>
         private static bool Raycast(RcPolyMesh poly, RcPolyMeshDetail meshDetail, RcVec3f sp, RcVec3f sq, out float hitTime)
         {
             hitTime = 0;
             if (meshDetail != null)
             {
+//方法首先检查 meshDetail 是否为空。如果不为空，遍历所有的子网格，并对每一个子网格中的三角形进行射线-三角形相交测试。
+//如果射线与任何一个三角形相交，方法返回 true，否则返回 false。
+//如果 meshDetail 为空，方法暂时返回 false，表示未实现对多边形网格（RcPolyMesh）的射线投射。
                 for (int i = 0; i < meshDetail.nmeshes; ++i)
                 {
                     int m = i * 4;

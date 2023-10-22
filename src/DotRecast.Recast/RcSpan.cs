@@ -21,18 +21,25 @@ freely, subject to the following restrictions:
 namespace DotRecast.Recast
 {
     /** Represents a span in a heightfield. */
+    // 表示高度场中的一个跨度
+    // 通常用于表示在高度场中的一个跨度，包含有关跨度的高度范围、区域ID和列中下一个跨度的信息。
+    // 这些信息在构建导航网格时有助于确定可行走区域和连接区域。
     public class RcSpan
     {
         /** The lower limit of the span. [Limit: &lt; smax] */
+        // 表示跨度的下限。限制条件：必须小于smax
         public int smin;
 
         /** The upper limit of the span. [Limit: &lt;= SPAN_MAX_HEIGHT] */
+        // 表示跨度的上限。限制条件：必须小于等于SPAN_MAX_HEIGHT
         public int smax;
 
         /** The area id assigned to the span. */
+        // 表示分配给跨度的区域ID
         public int area;
 
         /** The next span higher up in column. */
+        // RcSpan对象，表示列中更高的下一个跨度
         public RcSpan next;
     }
 }

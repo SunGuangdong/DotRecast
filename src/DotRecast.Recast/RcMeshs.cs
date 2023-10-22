@@ -25,12 +25,18 @@ namespace DotRecast.Recast
 {
     using static RcConstants;
 
+    /// <summary>
+    /// 静态类，它包含一些方法和常量，这些方法和常量用于处理三维网格。
+    /// </summary>
     public static class RcMeshs
     {
+        // 表示多边形网格中顶点的最大数量。在这里，它被设置为0xffff。
         public const int MAX_MESH_VERTS_POLY = 0xffff;
+        // 表示顶点桶的数量。在这里，它被设置为1 << 12，即4096。
         public const int VERTEX_BUCKET_COUNT = (1 << 12);
 
-
+        // 此方法根据输入的多边形数组、多边形数量、顶点数量和每个多边形的顶点数来构建多边形网格的邻接关系。
+        // 根据Eric Lengyel的代码，该方法首先计算每个多边形的边缘，然后计算相邻的多边形，最后将邻接关系存储在输入的多边形数组中。
         private static void BuildMeshAdjacency(int[] polys, int npolys, int nverts, int vertsPerPoly)
         {
             // Based on code by Eric Lengyel from:
@@ -115,7 +121,7 @@ namespace DotRecast.Recast
                 }
             }
         }
-
+        // 此方法根据输入的x、y和z坐标计算顶点哈希值。哈希值用于将顶点分配到不同的桶中。
         private static int ComputeVertexHash(int x, int y, int z)
         {
             uint h1 = 0x8da6b343; // Large multiplicative constants;
@@ -125,7 +131,7 @@ namespace DotRecast.Recast
             uint n = h1 * (uint)x + h2 * (uint)y + h3 * (uint)z;
             return (int)(n & (VERTEX_BUCKET_COUNT - 1));
         }
-
+        // 此方法将顶点添加到顶点数组中，并更新顶点桶。如果给定的顶点已经存在于顶点数组中，则返回该顶点的索引。否则，将新顶点添加到顶点数组中，并更新桶。
         private static int AddVertex(int x, int y, int z, int[] verts, int[] firstVert, int[] nextVert, ref int nv)
         {
             int bucket = ComputeVertexHash(x, 0, z);
@@ -151,43 +157,46 @@ namespace DotRecast.Recast
 
             return i;
         }
-
+        // 这两个方法分别返回给定索引的前一个和后一个索引。这些方法用于在多边形顶点数组中导航。
         public static int Prev(int i, int n)
         {
             return i - 1 >= 0 ? i - 1 : n - 1;
         }
-
+        // 这两个方法分别返回给定索引的前一个和后一个索引。这些方法用于在多边形顶点数组中导航。
         public static int Next(int i, int n)
         {
             return i + 1 < n ? i + 1 : 0;
         }
-
+        // 此方法计算三个顶点a、b和c组成的三角形的有向面积的两倍。
+        // 有向面积的符号表示三角形的顺序（顺时针或逆时针）。
         private static int Area2(int[] verts, int a, int b, int c)
         {
             return (verts[b + 0] - verts[a + 0]) * (verts[c + 2] - verts[a + 2])
                    - (verts[c + 0] - verts[a + 0]) * (verts[b + 2] - verts[a + 2]);
         }
 
-        // Returns true iff c is strictly to the left of the directed
-        // line through a to b.
+        // Returns true iff c is strictly to the left of the directed line through a to b.
+        // 此方法判断点c是否严格在有向线段ab的左侧。首先计算三角形abc的有向面积的两倍，如果结果小于0，则表示点c在有向线段ab的左侧，返回true；否则返回false。
         public static bool Left(int[] verts, int a, int b, int c)
         {
             return Area2(verts, a, b, c) < 0;
         }
-
+        // 此方法判断点c是否在有向线段ab的左侧或与线段ab共线。首先计算三角形abc的有向面积的两倍，
+        // 如果结果小于等于0，则表示点c在有向线段ab的左侧或共线，返回true；否则返回false。
         public static bool LeftOn(int[] verts, int a, int b, int c)
         {
             return Area2(verts, a, b, c) <= 0;
         }
-
+        // 此方法判断三个顶点a、b和c是否共线。首先计算三角形abc的有向面积的两倍，如果结果等于0，则表示三个顶点共线，返回true；否则返回false。
         private static bool Collinear(int[] verts, int a, int b, int c)
         {
             return Area2(verts, a, b, c) == 0;
         }
 
-        // Returns true iff ab properly intersects cd: they share
-        // a point interior to both segments. The properness of the
-        // intersection is ensured by using strict leftness.
+        // Returns true iff ab properly intersects cd: they sharea point interior to both segments.
+        // The properness of the intersection is ensured by using strict leftness.
+        // 此方法判断线段ab和cd是否在它们的内部共享一个点（严格相交）。首先，排除共线情况。
+        // 然后，检查线段ab的端点是否在线段cd的两侧，同时检查线段cd的端点是否在线段ab的两侧。如果满足这两个条件，则线段ab和cd严格相交，返回true；否则返回false。
         private static bool IntersectProp(int[] verts, int a, int b, int c, int d)
         {
             // Eliminate improper cases.
@@ -197,9 +206,9 @@ namespace DotRecast.Recast
 
             return (Left(verts, a, b, c) ^ Left(verts, a, b, d)) && (Left(verts, c, d, a) ^ Left(verts, c, d, b));
         }
-
-        // Returns T iff (a,b,c) are collinear and point c lies
-        // on the closed segment ab.
+        // 此方法判断点c是否在线段ab上。首先，检查点a、b和c是否共线。
+        // 然后，判断点c的x或y坐标是否在点a和点b的x或y坐标之间。如果满足这些条件，则点c在线段ab上，返回true；否则返回false。
+        // Returns T iff (a,b,c) are collinear and point c lies on the closed segment ab.
         private static bool Between(int[] verts, int a, int b, int c)
         {
             if (!Collinear(verts, a, b, c))
@@ -215,6 +224,8 @@ namespace DotRecast.Recast
         }
 
         // Returns true iff segments ab and cd intersect, properly or improperly.
+        // 此方法判断线段ab和cd是否相交（严格相交或非严格相交）。首先，检查线段ab和cd是否严格相交。
+        // 然后，检查线段ab的端点是否在线段cd上，或线段cd的端点是否在线段ab上。如果满足这些条件，则线段ab和cd相交，返回true；否则返回false。
         public static bool Intersect(int[] verts, int a, int b, int c, int d)
         {
             if (IntersectProp(verts, a, b, c, d))
@@ -226,14 +237,16 @@ namespace DotRecast.Recast
 
             return false;
         }
-
+        // 此方法判断两个顶点a和b是否相等。如果顶点a和顶点b的x和z坐标相等，则返回true；否则返回false。
         public static bool VEqual(int[] verts, int a, int b)
         {
             return verts[a + 0] == verts[b + 0] && verts[a + 2] == verts[b + 2];
         }
 
-        // Returns T iff (v_i, v_j) is a proper internal *or* external
-        // diagonal of P, *ignoring edges incident to v_i and v_j*.
+        // Returns T iff (v_i, v_j) is a proper internal *or* external diagonal of P,
+        // *ignoring edges incident to v_i and v_j*.
+        // 此方法判断线段(i, j)是否为多边形P的内部或外部对角线，忽略与顶点i和j相邻的边。
+        // 通过遍历多边形P的所有边，并检查线段(i, j)是否与多边形的其他边相交来实现。如果没有相交的边，则线段(i, j)是多边形P的对角线，返回true；否则返回false。
         private static bool Diagonalie(int i, int j, int n, int[] verts, int[] indices)
         {
             int d0 = (indices[i] & 0x0fffffff) * 4;
@@ -262,6 +275,8 @@ namespace DotRecast.Recast
 
         // Returns true iff the diagonal (i,j) is strictly internal to the
         // polygon P in the neighborhood of the i endpoint.
+        // 此方法判断线段(i, j)在顶点i的邻域内是否严格在多边形内部。首先，检查顶点i是否是凸顶点。如果顶点i是凸顶点，则检查线段(i, j)是否在顶点i的两个相邻顶点的内部。
+        // 如果顶点i是凹顶点，则检查线段(i, j)是否在顶点i的两个相邻顶点的外部。根据检查结果返回true或false。
         private static bool InCone(int i, int j, int n, int[] verts, int[] indices)
         {
             int pi = (indices[i] & 0x0fffffff) * 4;
@@ -279,13 +294,16 @@ namespace DotRecast.Recast
             return !(LeftOn(verts, pi, pj, pi1) && LeftOn(verts, pj, pi, pin1));
         }
 
-        // Returns T iff (v_i, v_j) is a proper internal
-        // diagonal of P.
+        // Returns T iff (v_i, v_j) is a proper internal diagonal of P.
+        // 此方法判断线段(i, j)是否是多边形P的内部对角线。首先，检查线段(i, j)在顶点i的邻域内是否严格在多边形内部。
+        // 然后，检查线段(i, j)是否为多边形P的内部或外部对角线，忽略与顶点i和j相邻的边。根据检查结果返回true或false。
         private static bool Diagonal(int i, int j, int n, int[] verts, int[] indices)
         {
             return InCone(i, j, n, verts, indices) && Diagonalie(i, j, n, verts, indices);
         }
-
+        // 此方法判断线段(i, j)是否为多边形P的内部或外部对角线，忽略与顶点i和j相邻的边。与Diagonalie方法类似，通过遍历多边形P的所有边，
+        // 并检查线段(i, j)是否与多边形的其他边严格相交来实现。但在这个方法中，使用IntersectProp方法检查相交，允许一定程度的误差。
+        // 如果没有相交的边，则线段(i, j)是多边形P的对角线，返回true；否则返回false。
         private static bool DiagonalieLoose(int i, int j, int n, int[] verts, int[] indices)
         {
             int d0 = (indices[i] & 0x0fffffff) * 4;
@@ -311,7 +329,9 @@ namespace DotRecast.Recast
 
             return true;
         }
-
+        // 此方法判断线段(i, j)在顶点i的邻域内是否在多边形内部。与InCone方法类似，首先检查顶点i是否是凸顶点。
+        // 如果顶点i是凸顶点，则检查线段(i, j)是否在顶点i的两个相邻顶点的内部。如果顶点i是凹顶点，则检查线段(i, j)是否在顶点i的两个相邻顶点的外部。
+        // 但在这个方法中，使用LeftOn方法检查顶点位置，允许一定程度的误差。根据检查结果返回true或false。
         private static bool InConeLoose(int i, int j, int n, int[] verts, int[] indices)
         {
             int pi = (indices[i] & 0x0fffffff) * 4;
@@ -326,12 +346,16 @@ namespace DotRecast.Recast
             // else P[i] is reflex.
             return !(LeftOn(verts, pi, pj, pi1) && LeftOn(verts, pj, pi, pin1));
         }
-
+        // 此方法判断线段(i, j)是否是多边形P的内部对角线。与Diagonal方法类似，首先检查线段(i, j)在顶点i的邻域内是否在多边形内部。
+        // 然后检查线段(i, j)是否为多边形P的内部或外部对角线，忽略与顶点i和j相邻的边。
+        // 但在这个方法中，使用InConeLoose和DiagonalieLoose方法检查顶点位置和对角线条件，允许一定程度的误差。根据检查结果返回true或false。
         private static bool DiagonalLoose(int i, int j, int n, int[] verts, int[] indices)
         {
             return InConeLoose(i, j, n, verts, indices) && DiagonalieLoose(i, j, n, verts, indices);
         }
 
+        // 此方法将输入的多边形顶点数组三角剖分，并将结果存储在三角形数组中。它使用一种称为耳剪法的算法来进行三角剖分。
+        // 耳剪法通过找到多边形中的凹顶点，并将其与相邻的顶点连接形成三角形，然后从多边形中移除这个凹顶点，重复此过程直到只剩下一个三角形。返回值是生成的三角形数量。
         private static int Triangulate(int n, int[] verts, int[] indices, int[] tris)
         {
             int ntris = 0;
@@ -448,7 +472,7 @@ namespace DotRecast.Recast
 
             return ntris;
         }
-
+        // 此方法计算给定多边形数组中的顶点数。它遍历多边形数组，当遇到RC_MESH_NULL_IDX时停止计数。这个方法用于确定多边形中实际的顶点数量。
         private static int CountPolyVerts(int[] p, int j, int nvp)
         {
             for (int i = 0; i < nvp; ++i)
@@ -456,13 +480,14 @@ namespace DotRecast.Recast
                     return i;
             return nvp;
         }
-
+        // 检查顶点a、b和c的顺序是否为逆时针。如果逆时针，返回true；否则返回false。
         private static bool Uleft(int[] verts, int a, int b, int c)
         {
             return (verts[b + 0] - verts[a + 0]) * (verts[c + 2] - verts[a + 2])
                 - (verts[c + 0] - verts[a + 0]) * (verts[b + 2] - verts[a + 2]) < 0;
         }
-
+        // 计算两个多边形之间的合并值。首先检查多边形是否共享一条边，如果没有共享边则返回-1。
+        // 然后检查合并后的多边形是否是凸的，如果不是凸的则返回-1。最后计算合并值，返回合并值。
         private static int GetPolyMergeValue(int[] polys, int pa, int pb, int[] verts, out int ea, out int eb, int nvp)
         {
             ea = 0;
@@ -534,7 +559,7 @@ namespace DotRecast.Recast
 
             return (dx * dx) + (dy * dy);
         }
-
+        // 合并两个多边形。首先计算合并后的多边形顶点，然后将新的多边形顶点复制回原始多边形数组。
         private static void MergePolyVerts(int[] polys, int pa, int pb, int ea, int eb, int tmp, int nvp)
         {
             int na = CountPolyVerts(polys, pa, nvp);
@@ -559,7 +584,7 @@ namespace DotRecast.Recast
 
             Array.Copy(polys, tmp, polys, pa, nvp);
         }
-
+        // 将一个元素插入到数组的开头。
         private static int PushFront(int v, int[] arr, int an)
         {
             an++;
@@ -568,14 +593,15 @@ namespace DotRecast.Recast
             arr[0] = v;
             return an;
         }
-
+        // 将一个元素添加到数组的末尾。
         private static int PushBack(int v, int[] arr, int an)
         {
             arr[an] = v;
             an++;
             return an;
         }
-
+        // 判断一个顶点是否可以被移除。首先计算移除顶点后剩余的边数，如果剩余边数小于等于2，则不能移除顶点。
+        // 然后检查共享移除顶点的边，如果有多于2个开放边，则不能移除顶点。否则返回true，表示可以移除顶点。
         private static bool CanRemoveVertex(RcTelemetry ctx, RcPolyMesh mesh, int rem)
         {
             int nvp = mesh.nvp;
@@ -678,7 +704,17 @@ namespace DotRecast.Recast
 
             return true;
         }
-
+        /*
+         * 用于从多边形网格中删除指定的顶点。以下是这个方法的主要步骤：
+            计算要删除的顶点所在的多边形数量。
+            收集与删除顶点相邻的边。
+            删除包含要删除顶点的多边形。
+            删除顶点，并更新多边形中的顶点索引。
+            根据收集的边，重新连接形成的空洞。
+            使用三角剖分算法将空洞填充为多个三角形。
+            将新生成的三角形合并为多边形，并将它们添加回多边形网格中。
+            此方法在多边形网格处理过程中用于优化多边形网格，例如在简化多边形网格时删除不必要的顶点。
+         */
         private static void RemoveVertex(RcTelemetry ctx, RcPolyMesh mesh, int rem, int maxTris)
         {
             int nvp = mesh.nvp;
@@ -962,10 +998,13 @@ namespace DotRecast.Recast
 
         /// @par
         ///
-        /// @note If the mesh data is to be used to construct a Detour navigation mesh, then the upper
-        /// limit must be restricted to <= #DT_VERTS_PER_POLYGON.
+        /// @note If the mesh data is to be used to construct a Detour navigation mesh, then the upper limit must be restricted to <= #DT_VERTS_PER_POLYGON.
+        /// 注意 如果网格数据用于构造 Detour 导航网格，则上限必须限制为 <= #DT_VERTS_PER_POLYGON。
         ///
         /// @see rcAllocPolyMesh, rcContourSet, rcPolyMesh, rcConfig
+        /// 根据RcContourSet（轮廓集合）构建一个RcPolyMesh（多边形网格）。首先计算多边形网格的最大顶点数、最大三角形数和每个轮廓的最大顶点数。
+        /// 然后分配多边形网格的顶点、多边形、区域和区域标志数组。接下来，遍历所有的轮廓，对每个轮廓进行三角剖分，并将结果添加到多边形网格中。
+        /// 最后，计算多边形网格的邻接关系，并为边界边找到门户边。
         public static RcPolyMesh BuildPolyMesh(RcTelemetry ctx, RcContourSet cset, int nvp)
         {
             using var timer = ctx.ScopedTimer(RcTimerLabel.RC_TIMER_BUILD_POLYMESH);
@@ -1211,6 +1250,9 @@ namespace DotRecast.Recast
         }
 
         /// @see rcAllocPolyMesh, rcPolyMesh
+        /// 合并多个RcPolyMesh（多边形网格）为一个RcPolyMesh。首先计算合并后的多边形网格的属性，
+        /// 然后分配合并后的多边形网格的顶点、多边形、区域和区域标志数组。
+        /// 接着，遍历所有输入的多边形网格，将它们的顶点和多边形添加到合并后的多边形网格中。最后，计算合并后的多边形网格的邻接关系。
         public static RcPolyMesh MergePolyMeshes(RcTelemetry ctx, RcPolyMesh[] meshes, int nmeshes)
         {
             if (nmeshes == 0 || meshes == null)
@@ -1338,7 +1380,8 @@ namespace DotRecast.Recast
 
             return mesh;
         }
-
+        // 复制一个RcPolyMesh（多边形网格）。创建一个新的RcPolyMesh实例，并将源多边形网格的属性复制到新的实例中。
+        // 然后分配新的多边形网格的顶点、多边形、区域和区域标志数组，并将源多边形网格的数据复制到新的数组中。
         public static RcPolyMesh CopyPolyMesh(RcTelemetry ctx, RcPolyMesh src)
         {
             RcPolyMesh dst = new RcPolyMesh();
