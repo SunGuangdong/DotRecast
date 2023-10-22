@@ -27,11 +27,15 @@ using static DotRecast.Recast.RcCommons;
 
 namespace DotRecast.Recast.Demo.Draw;
 
+/// <summary>
+/// 它负责渲染导航网格。
+/// </summary>
 public class NavMeshRenderer
 {
     private readonly RecastDebugDraw _debugDraw;
     private readonly int _navMeshDrawFlags = RecastDebugDraw.DRAWNAVMESH_OFFMESHCONS | RecastDebugDraw.DRAWNAVMESH_CLOSEDLIST;
 
+    // 构造函数：接收一个RecastDebugDraw类型的对象，用于存储绘制任务的引用。
     public NavMeshRenderer(RecastDebugDraw debugDraw)
     {
         _debugDraw = debugDraw;
@@ -42,6 +46,12 @@ public class NavMeshRenderer
         return _debugDraw;
     }
 
+    /// <summary>
+    /// 根据给定的DemoSample和DrawMode，渲染导航网格。这个方法首先检查输入的sample是否为空，然后根据drawMode绘制不同的网格元素，如三角形网格、边界框、离网连接等。
+    /// </summary>
+    /// <param name="sample"></param>
+    /// <param name="drawMode"></param>
+    /// <returns></returns>
     public void Render(DemoSample sample, DrawMode drawMode)
     {
         if (sample == null)
@@ -207,6 +217,11 @@ public class NavMeshRenderer
         }
     }
 
+    /// <summary>
+    /// 绘制DemoInputGeomProvider对象的边界框。
+    /// </summary>
+    /// <param name="geom"></param>
+    /// <returns></returns>
     private void DrawGeomBounds(DemoInputGeomProvider geom)
     {
         // Draw bounds
@@ -218,7 +233,13 @@ public class NavMeshRenderer
         _debugDraw.Vertex(bmin.x, bmin.y, bmin.z, DebugDraw.DuRGBA(255, 255, 255, 128));
         _debugDraw.End();
     }
-
+    
+    /// <summary>
+    /// 绘制DemoInputGeomProvider对象的离网连接。
+    /// </summary>
+    /// <param name="geom"></param>
+    /// <param name="hilight"></param>
+    /// <returns></returns>
     public void DrawOffMeshConnections(DemoInputGeomProvider geom, bool hilight)
     {
         int conColor = DebugDraw.DuRGBA(192, 0, 128, 192);
@@ -248,7 +269,11 @@ public class NavMeshRenderer
 
         _debugDraw.DepthMask(true);
     }
-
+    /// <summary>
+    /// 绘制DemoInputGeomProvider对象的凸体积。
+    /// </summary>
+    /// <param name="geom"></param>
+    /// <returns></returns>
     void DrawConvexVolumes(DemoInputGeomProvider geom)
     {
         _debugDraw.DepthMask(false);

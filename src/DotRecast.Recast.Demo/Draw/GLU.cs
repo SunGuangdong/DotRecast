@@ -21,8 +21,12 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast.Demo.Draw;
 
+/// <summary>
+/// 包含了一些与OpenGL相关的数学计算方法。
+/// </summary>
 public static class GLU
 {
+    // 根据给定的视场角度（fovy）、长宽比（aspect）、近裁剪面（near）和远裁剪面（far）计算一个透视投影矩阵。返回一个RcMatrix4x4f类型的投影矩阵。
     public static RcMatrix4x4f GluPerspective(float fovy, float aspect, float near, float far)
     {
         var projectionMatrix = new RcMatrix4x4f();
@@ -31,6 +35,7 @@ public static class GLU
         return projectionMatrix;
     }
 
+    // 计算一个透视投影矩阵，与GluPerspective方法类似，但是将结果矩阵作为引用参数传递。
     public static void GlhPerspectivef2(ref RcMatrix4x4f matrix, float fovyInDegrees, float aspectRatio, float znear, float zfar)
     {
         float ymax, xmax;
@@ -39,6 +44,7 @@ public static class GLU
         GlhFrustumf2(ref matrix, -xmax, xmax, -ymax, ymax, znear, zfar);
     }
 
+    // 根据给定的裁剪面坐标（left, right, bottom, top）、近裁剪面（znear）和远裁剪面（zfar）计算一个透视投影矩阵，将结果矩阵作为引用参数传递。
     private static void GlhFrustumf2(ref RcMatrix4x4f matrix, float left, float right, float bottom, float top, float znear, float zfar)
     {
         float temp, temp2, temp3, temp4;
@@ -64,23 +70,27 @@ public static class GLU
         matrix.M44 = 0.0f;
     }
 
+    // 将屏幕坐标（winx, winy, winz）转换为世界坐标。需要提供模型视图矩阵（modelview）、投影矩阵（projection）和视口数组（viewport）。返回一个RcVec3f类型的世界坐标。
     public static int GlhUnProjectf(float winx, float winy, float winz, float[] modelview, float[] projection, int[] viewport, ref RcVec3f objectCoordinate)
     {
-        // Transformation matrices
+        // Transformation matrices       变换矩阵
         float[] m = new float[16], A = new float[16];
         float[] @in = new float[4], @out = new float[4];
-        // Calculation for inverting a matrix, compute projection x modelview
-        // and store in A[16]
+        // Calculation for inverting a matrix, compute projection x modelview and store in A[16]
+        // 计算矩阵求逆，计算投影 x modelview 并存储在 A[16] 中
         MultiplyMatrices4by4OpenGL_FLOAT(A, projection, modelview);
         // Now compute the inverse of matrix A
+        // 计算矩阵求逆，计算投影 x modelview 并存储在 A[16] 中
         if (GlhInvertMatrixf2(A, m) == 0)
             return 0;
         // Transformation of normalized coordinates between -1 and 1
+        // -1 和 1 之间标准化坐标的变换
         @in[0] = (winx - viewport[0]) / viewport[2] * 2.0f - 1.0f;
         @in[1] = (winy - viewport[1]) / viewport[3] * 2.0f - 1.0f;
         @in[2] = 2.0f * winz - 1.0f;
         @in[3] = 1.0f;
         // Objects coordinates
+        // 物体坐标
         MultiplyMatrixByVector4by4OpenGL_FLOAT(@out, m, @in);
         if (@out[3] == 0.0)
             return 0;
@@ -91,6 +101,7 @@ public static class GLU
         return 1;
     }
 
+    // 计算两个4x4矩阵的乘积。
     static void MultiplyMatrices4by4OpenGL_FLOAT(float[] result, float[] matrix1, float[] matrix2)
     {
         result[0] = matrix1[0] * matrix2[0] + matrix1[4] * matrix2[1] + matrix1[8] * matrix2[2] + matrix1[12] * matrix2[3];
@@ -114,6 +125,7 @@ public static class GLU
         result[15] = matrix1[3] * matrix2[12] + matrix1[7] * matrix2[13] + matrix1[11] * matrix2[14] + matrix1[15] * matrix2[15];
     }
 
+    // 计算一个4x4矩阵与一个4维向量的乘积。
     static void MultiplyMatrixByVector4by4OpenGL_FLOAT(float[] resultvector, float[] matrix, float[] pvector)
     {
         resultvector[0] = matrix[0] * pvector[0] + matrix[4] * pvector[1] + matrix[8] * pvector[2] + matrix[12] * pvector[3];
@@ -123,6 +135,7 @@ public static class GLU
     }
 
     // This code comes directly from GLU except that it is for float
+    // 计算一个4x4矩阵的逆矩阵。如果矩阵可逆，返回1，否则返回0。
     static int GlhInvertMatrixf2(float[] m, float[] @out)
     {
         float[][] wtmp = RcArrayUtils.Of<float>(4, 8);
@@ -357,11 +370,12 @@ public static class GLU
         return 1;
     }
 
+    // 一个辅助方法，用于获取或设置一个一维数组表示的4x4矩阵中的元素。
     static float MAT(float[] m, int r, int c)
     {
         return m[(c) * 4 + (r)];
     }
-
+    // 一个辅助方法，用于获取或设置一个一维数组表示的4x4矩阵中的元素。
     static void MAT(float[] m, int r, int c, float v)
     {
         m[(c) * 4 + (r)] = v;

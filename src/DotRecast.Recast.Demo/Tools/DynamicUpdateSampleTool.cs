@@ -38,17 +38,24 @@ using static DotRecast.Recast.Demo.Draw.DebugDrawPrimitives;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 这个类主要用于处理动态导航网格的构建、更新和射线检测等操作。
+/// 它使用RcDynamicUpdateTool类来执行动态更新操作，如设置、更新和分析动态导航网格。类中的方法允许用户通过ImGui库提供的UI控件调整动态更新
+/// </summary>
 public class DynamicUpdateSampleTool : ISampleTool
 {
+    // 静态的ILogger实例，用于记录日志。
     private static readonly ILogger Logger = Log.ForContext<DynamicUpdateSampleTool>();
-
+    // DemoSample实例，表示样本数据。
     private DemoSample _sample;
+    // RcDynamicUpdateTool实例，用于处理动态更新操作。
     private readonly RcDynamicUpdateTool _tool;
-
+    // RcDynamicUpdateToolMode枚举，表示当前工具模式。
     private RcDynamicUpdateToolMode mode = RcDynamicUpdateToolMode.BUILD;
+    // float类型，表示栅格单元大小。
     private float cellSize = 0.3f;
 
-    // build config
+    // build config与构建配置相关的字段
     private int partitioning = RcPartitionType.WATERSHED.Value;
     private float walkableSlopeAngle = 45f;
     private float walkableHeight = 2f;
@@ -75,18 +82,18 @@ public class DynamicUpdateSampleTool : ISampleTool
     private bool showColliders = false;
     private long buildTime;
     private long raycastTime;
-
+    // RcDynamicColliderShape枚举，表示碰撞体形状。
     private RcDynamicColliderShape colliderShape = RcDynamicColliderShape.SPHERE;
-
+    // TaskFactory实例，用于执行异步任务。
     private readonly TaskFactory executor;
-
+    // 与射线检测相关的字段，例如：sposSet、eposSet、spos、epos、raycastHit、raycastHitPos等。这些字段用于存储射线检测的起始位置、结束位置和检测结果。
     private bool sposSet;
     private bool eposSet;
     private RcVec3f spos;
     private RcVec3f epos;
     private bool raycastHit;
     private RcVec3f raycastHitPos;
-
+    // 构造函数：初始化一个新的DynamicUpdateSampleTool实例，加载三个输入几何体文件（bridge.obj、house.obj、convex.obj）并创建一个RcDynamicUpdateTool实例。
     public DynamicUpdateSampleTool()
     {
         var bridgeGeom = DemoInputGeomProvider.LoadFile("bridge.obj");
@@ -95,7 +102,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         _tool = new(Random.Shared, bridgeGeom, houseGeom, convexGeom);
         executor = Task.Factory;
     }
-
+    // 使用ImGui库呈现和调整工具参数。这个方法使用ImGui库创建UI控件，允许用户调整动态更新工具的参数和配置。
     public void Layout()
     {
         var prevModeIdx = mode.Idx;
@@ -274,7 +281,7 @@ public class DynamicUpdateSampleTool : ISampleTool
             ImGui.Text($"Build Time: {buildTime} ms");
         }
     }
-
+    // 使用ImGui库呈现和调整工具参数。这个方法使用ImGui库创建UI控件，允许用户调整动态更新工具的参数和配置。
     public void HandleRender(NavMeshRenderer renderer)
     {
         if (mode == RcDynamicUpdateToolMode.COLLIDERS)
@@ -316,7 +323,7 @@ public class DynamicUpdateSampleTool : ISampleTool
             dd.DepthMask(true);
         }
     }
-
+    // 使用ImGui库呈现和调整工具参数。这个方法使用ImGui库创建UI控件，允许用户调整动态更新工具的参数和配置。
     private void DrawAgent(RecastDebugDraw dd, RcVec3f pos, int col)
     {
         var settings = _sample.GetSettings();
@@ -338,12 +345,12 @@ public class DynamicUpdateSampleTool : ISampleTool
         dd.End();
         dd.DepthMask(true);
     }
-
+    // 返回_tool实例。这个方法返回_tool实例，它是一个RcDynamicUpdateTool实例，用于处理动态更新操作。
     public IRcToolable GetTool()
     {
         return _tool;
     }
-
+    // 设置_sample实例。这个方法设置_sample实例，它是一个DemoSample实例，表示样本数据。
     public void SetSample(DemoSample sample)
     {
         _sample = sample;
@@ -354,7 +361,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         // ..
     }
 
-
+    // 处理点击事件。这个方法根据当前工具模式（构建、碰撞器、射线检测等）处理用户的点击事件。
     public void HandleClick(RcVec3f s, RcVec3f p, bool shift)
     {
         if (mode == RcDynamicUpdateToolMode.COLLIDERS)
@@ -390,7 +397,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         }
     }
 
-
+    // 处理射线点击事件。这个方法在当前版本中没有实现，可能会在未来的版本中实现射线点击事件的处理。
     public void HandleClickRay(RcVec3f start, RcVec3f dir, bool shift)
     {
         if (mode == RcDynamicUpdateToolMode.COLLIDERS)
@@ -401,7 +408,7 @@ public class DynamicUpdateSampleTool : ISampleTool
             }
         }
     }
-
+    // 处理更新事件，更新_tool。这个方法在每帧更新时调用，负责更新_tool实例以进行动态导航网格的更新和分析。
     public void HandleUpdate(float dt)
     {
         long t = RcFrequency.Ticks;
@@ -422,7 +429,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         }
     }
 
-
+    // 加载文件并更新动态导航网格配置。
     private void Load(string filename)
     {
         try
@@ -438,12 +445,12 @@ public class DynamicUpdateSampleTool : ISampleTool
         }
     }
 
-
+    // 保存动态导航网格到文件。
     private void Save(string filename)
     {
         _tool.Save(filename, compression, DtVoxelTileLZ4DemoCompressor.Shared);
     }
-
+    // 构建动态导航网格。
     private void BuildDynaMesh()
     {
         var dynaMesh = _tool.GetDynamicNavMesh();
@@ -461,7 +468,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         buildTime = (RcFrequency.Ticks - t) / TimeSpan.TicksPerMillisecond;
         _sample.Update(null, dynaMesh.RecastResults(), dynaMesh.NavMesh());
     }
-
+    // 将当前工具的配置参数更新到给定的动态导航网格配置中。
     private void UpdateTo(DtDynamicNavMeshConfig config)
     {
         config.partition = partitioning;
@@ -481,7 +488,7 @@ public class DynamicUpdateSampleTool : ISampleTool
         config.detailSampleDistance = detailSampleDist;
         config.detailSampleMaxError = detailSampleMaxError;
     }
-
+    // 从给定的动态导航网格配置中更新当前工具的配置参数。
     private void UpdateFrom(DtDynamicNavMeshConfig config)
     {
         cellSize = config.cellSize;

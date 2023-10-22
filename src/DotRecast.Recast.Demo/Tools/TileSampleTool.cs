@@ -10,13 +10,18 @@ using static DotRecast.Recast.Demo.Draw.DebugDraw;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 这个类用于在3D环境中处理导航网格的瓦片。
+/// </summary>
 public class TileSampleTool : ISampleTool
 {
     private static readonly ILogger Logger = Log.ForContext<TileSampleTool>();
 
     private DemoSample _sample;
+    // 存储RcTileTool对象，用于处理导航网格的瓦片。
     private readonly RcTileTool _tool;
 
+    // 用于存储鼠标点击的位置信息。
     private bool _hitPosSet;
     private RcVec3f _hitPos;
 
@@ -24,7 +29,7 @@ public class TileSampleTool : ISampleTool
     {
         _tool = new();
     }
-
+    // 存储RcTileTool对象，用于处理导航网格的瓦片。
     public void Layout()
     {
         var geom = _sample.GetInputGeom();
@@ -41,7 +46,7 @@ public class TileSampleTool : ISampleTool
             _tool.RemoveAllTiles(geom, settings, navMesh);
         }
     }
-
+    // 此方法用于在场景中渲染导航网格和瓦片。它使用RecastDebugDraw类来执行实际的渲染操作。
     public void HandleRender(NavMeshRenderer renderer)
     {
         var geom = _sample.GetInputGeom();
@@ -97,7 +102,7 @@ public class TileSampleTool : ISampleTool
     {
     }
 
-
+    // 此方法用于处理鼠标点击事件。根据是否按下Shift键，它会执行不同的操作，如创建或删除瓦片。
     public void HandleClick(RcVec3f s, RcVec3f p, bool shift)
     {
         _hitPosSet = true;

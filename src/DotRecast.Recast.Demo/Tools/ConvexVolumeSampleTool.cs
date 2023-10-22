@@ -31,26 +31,35 @@ using static DotRecast.Recast.Demo.Draw.DebugDrawPrimitives;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 实现了ISampleTool接口，它是一个用于处理凸体样本的工具。该类包含了一些用于处理和渲染凸体形状的方法。以下是类中主要成员的简要说明：
+/// 
+/// 该类的主要目的是处理和渲染凸体形状。它使用RcConvexVolumeTool类来执行凸体相关操作，如添加、删除和创建凸体。
+/// 类中的方法允许用户通过点击和拖动来创建和调整凸体形状，并通过ImGui库提供的UI控件调整参数。当凸体形状发生变化时，HandleRender方法负责渲染它们。
+/// </summary>
 public class ConvexVolumeSampleTool : ISampleTool
 {
+    // 一个静态的ILogger实例，用于记录日志。
     private static readonly ILogger Logger = Log.ForContext<ConvexVolumeSampleTool>();
-
+    // 一个DemoSample实例，表示样本数据。
     private DemoSample _sample;
+    // 一个RcConvexVolumeTool实例，用于处理凸体相关操作。
     private readonly RcConvexVolumeTool _tool;
-
+    // 浮点数，表示凸体形状的高度、下降和多边形偏移。
     private float _boxHeight = 6f;
     private float _boxDescent = 1f;
     private float _polyOffset = 0f;
-
+    // 表示凸体区域类型的整数值和RcAreaModification实例。
     private int _areaTypeValue = SampleAreaModifications.SAMPLE_AREAMOD_GRASS.Value;
     private RcAreaModification _areaType = SampleAreaModifications.SAMPLE_AREAMOD_GRASS;
 
-
+    // 初始化一个新的RcConvexVolumeTool实例。
     public ConvexVolumeSampleTool()
     {
         _tool = new RcConvexVolumeTool();
     }
-
+    
+    // 使用ImGui库呈现和调整工具参数。
     public void Layout()
     {
         ImGui.SliderFloat("Shape Height", ref _boxHeight, 0.1f, 20f, "%.1f");
@@ -91,7 +100,8 @@ public class ConvexVolumeSampleTool : ISampleTool
             }
         }
     }
-
+    
+    // 渲染凸体形状
     public void HandleRender(NavMeshRenderer renderer)
     {
         RecastDebugDraw dd = renderer.GetDebugDraw();
@@ -143,18 +153,18 @@ public class ConvexVolumeSampleTool : ISampleTool
     {
         return _tool;
     }
-
+    // 设置_sample实例。
     public void SetSample(DemoSample sample)
     {
         _sample = sample;
     }
 
-
+    // 处理样本更改事件。
     public void OnSampleChanged()
     {
         // ..
     }
-
+    // 处理点击事件，添加或删除凸体。
     public void HandleClick(RcVec3f s, RcVec3f p, bool shift)
     {
         var geom = _sample.GetInputGeom();
@@ -172,12 +182,12 @@ public class ConvexVolumeSampleTool : ISampleTool
         }
     }
 
-
+    // 处理更新事件。
     public void HandleUpdate(float dt)
     {
         // TODO Auto-generated method stub
     }
-
+    // 处理射线点击事件。
     public void HandleClickRay(RcVec3f start, RcVec3f direction, bool shift)
     {
     }

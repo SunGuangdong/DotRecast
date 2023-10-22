@@ -27,7 +27,9 @@ namespace DotRecast.Recast.Demo.Draw;
 
 public class DebugDraw
 {
+    // ，用于存储OpenGL纹理
     private readonly GLCheckerTexture g_tex;
+    // 用于处理OpenGL绘制操作。
     private readonly ModernOpenGLDraw openGlDraw;
 
     public DebugDraw(GL gl)
@@ -35,58 +37,58 @@ public class DebugDraw
         g_tex = new GLCheckerTexture(gl);
         openGlDraw = new ModernOpenGLDraw(gl);
     }
-
+    // 返回openGlDraw对象。
     private ModernOpenGLDraw GetOpenGlDraw()
     {
         return openGlDraw;
     }
-
+    // 初始化DebugDraw对象，调用openGlDraw的Init方法。
     public void Init(float fogDistance)
     {
         GetOpenGlDraw().Init();
     }
-
+    // 清除DebugDraw对象，调用openGlDraw的Clear方法。
     public void Clear()
     {
         GetOpenGlDraw().Clear();
     }
-
+    // 结束DebugDraw对象，调用openGlDraw的End方法。
     public void End()
     {
         GetOpenGlDraw().End();
     }
-
+    // 开始绘制指定类型的图元，调用另一个Begin方法并传入默认大小1f。
     public void Begin(DebugDrawPrimitives prim)
     {
         Begin(prim, 1f);
     }
-
+    // 开始绘制指定类型和大小的图元，调用openGlDraw的Begin方法。
     public void Begin(DebugDrawPrimitives prim, float size)
     {
         GetOpenGlDraw().Begin(prim, size);
     }
 
-
+    // 设置雾效果的开始和结束距离，调用openGlDraw的Fog方法。
     public void Fog(float start, float end)
     {
         GetOpenGlDraw().Fog(start, end);
     }
-
+    // 设置雾效果的开启或关闭状态，调用openGlDraw的Fog方法。
     public void Fog(bool state)
     {
         GetOpenGlDraw().Fog(state);
     }
-
+    // 设置深度掩码的开启或关闭状态，调用openGlDraw的DepthMask方法。
     public void DepthMask(bool state)
     {
         GetOpenGlDraw().DepthMask(state);
     }
-
+    // 设置纹理的开启或关闭状态，调用openGlDraw的Texture方法并传入g_tex对象。
     public void Texture(bool state)
     {
         GetOpenGlDraw().Texture(g_tex, state);
     }
-
+    // 一系列重载的Vertex方法，用于向openGlDraw添加顶点。
     public void Vertex(float[] pos, int color)
     {
         GetOpenGlDraw().Vertex(pos, color);
@@ -112,7 +114,7 @@ public class DebugDraw
         GetOpenGlDraw().Vertex(x, y, z, color, u, v);
     }
 
-
+    // 绘制线框圆柱体。
     public void DebugDrawCylinderWire(float minx, float miny, float minz, float maxx, float maxy, float maxz, int col,
         float lineWidth)
     {
@@ -162,7 +164,7 @@ public class DebugDraw
             Vertex(cx + cylinderDir[i * 2 + 0] * rx, maxy, cz + cylinderDir[i * 2 + 1] * rz, col);
         }
     }
-
+    // 绘制线框盒子。
     public void DebugDrawBoxWire(float minx, float miny, float minz, float maxx, float maxy, float maxz, int col,
         float lineWidth)
     {
@@ -170,7 +172,7 @@ public class DebugDraw
         AppendBoxWire(minx, miny, minz, maxx, maxy, maxz, col);
         End();
     }
-
+    // 绘制XZ平面上的网格。
     public void DebugDrawGridXZ(float ox, float oy, float oz, int w, int h, float size, int col, float lineWidth)
     {
         Begin(DebugDrawPrimitives.LINES, lineWidth);
@@ -189,7 +191,7 @@ public class DebugDraw
         End();
     }
 
-
+    // 添加线框盒子顶点。
     public void AppendBoxWire(float minx, float miny, float minz, float maxx, float maxy, float maxz, int col)
     {
         // Top
@@ -236,7 +238,7 @@ public class DebugDraw
         new[] { 0f, 0f, 0f },
         new[] { 0f, 0f, 0f }
     };
-
+    
     public void AppendBox(float minx, float miny, float minz, float maxx, float maxy, float maxz, int[] fcol)
     {
         boxVerts[0][0] = minx;
@@ -284,7 +286,7 @@ public class DebugDraw
             idx++;
         }
     }
-
+    // 绘制圆弧。
     public void DebugDrawArc(float x0, float y0, float z0, float x1, float y1, float z1, float h, float as0, float as1, int col,
         float lineWidth)
     {
@@ -292,7 +294,7 @@ public class DebugDraw
         AppendArc(x0, y0, z0, x1, y1, z1, h, as0, as1, col);
         End();
     }
-
+    // 绘制圆。
     public void DebugDrawCircle(float x, float y, float z, float r, int col, float lineWidth)
     {
         Begin(DebugDrawPrimitives.LINES, lineWidth);
@@ -305,7 +307,7 @@ public class DebugDraw
     private readonly float[] circeDir = new float[CIRCLE_NUM_SEG * 2];
     private RcMatrix4x4f _viewMatrix = new();
     private RcMatrix4x4f _projectionMatrix = new();
-
+    // 绘制圆。
     public void AppendCircle(float x, float y, float z, float r, int col)
     {
         if (!circleInit)
@@ -376,14 +378,14 @@ public class DebugDraw
         res.y = y0 + dy * u + h * (1 - (u * 2 - 1) * (u * 2 - 1));
         res.z = z0 + dz * u;
     }
-
+    // 绘制十字形。
     public void DebugDrawCross(float x, float y, float z, float size, int col, float lineWidth)
     {
         Begin(DebugDrawPrimitives.LINES, lineWidth);
         AppendCross(x, y, z, size, col);
         End();
     }
-
+    // 添加十字形顶点。
     private void AppendCross(float x, float y, float z, float s, int col)
     {
         Vertex(x - s, y, z, col);
@@ -393,21 +395,21 @@ public class DebugDraw
         Vertex(x, y, z - s, col);
         Vertex(x, y, z + s, col);
     }
-
+    // 添加十字形顶点。
     public void DebugDrawBox(float minx, float miny, float minz, float maxx, float maxy, float maxz, int[] fcol)
     {
         Begin(DebugDrawPrimitives.QUADS);
         AppendBox(minx, miny, minz, maxx, maxy, maxz, fcol);
         End();
     }
-
+    // 绘制实心圆柱体。
     public void DebugDrawCylinder(float minx, float miny, float minz, float maxx, float maxy, float maxz, int col)
     {
         Begin(DebugDrawPrimitives.TRIS);
         AppendCylinder(minx, miny, minz, maxx, maxy, maxz, col);
         End();
     }
-
+    // 添加实心圆柱体顶点。
     public void AppendCylinder(float minx, float miny, float minz, float maxx, float maxy, float maxz, int col)
     {
         InitCylinder();
@@ -446,7 +448,7 @@ public class DebugDraw
             Vertex(cx + cylinderDir[i * 2 + 0] * rx, maxy, cz + cylinderDir[i * 2 + 1] * rz, col);
         }
     }
-
+    // 绘制箭头，输入参数为箭头的起点和终点坐标、箭头头部的大小、颜色和线宽。调用Begin方法开始绘制线段，然后调用AppendArrow方法添加箭头顶点，最后调用End方法结束绘制。
     public void DebugDrawArrow(float x0, float y0, float z0, float x1, float y1, float z1, float as0, float as1, int col,
         float lineWidth)
     {
@@ -454,7 +456,7 @@ public class DebugDraw
         AppendArrow(x0, y0, z0, x1, y1, z1, as0, as1, col);
         End();
     }
-
+    // 绘制箭头，输入参数为箭头的起点和终点坐标、箭头头部的大小、颜色和线宽。调用Begin方法开始绘制线段，然后调用AppendArrow方法添加箭头顶点，最后调用End方法结束绘制。
     public void AppendArrow(float x0, float y0, float z0, float x1, float y1, float z1, float as0, float as1, int col)
     {
         Vertex(x0, y0, z0, col);
@@ -468,7 +470,7 @@ public class DebugDraw
         if (as1 > 0.001f)
             AppendArrowHead(q, p, as1, col);
     }
-
+    // 添加箭头头部顶点，输入参数为箭头头部的起点和终点坐标、大小和颜色。计算箭头头部的三角形顶点，然后调用Vertex方法添加顶点。
     void AppendArrowHead(RcVec3f p, RcVec3f q, float s, int col)
     {
         const float eps = 0.001f;
@@ -494,14 +496,14 @@ public class DebugDraw
         // Vertex(p.x+az.x*s-ay.x*s/2, p.y+az.y*s-ay.y*s/2, p.z+az.z*s-ay.z*s/2, col);
         Vertex(p.x + az.x * s - ax.x * s / 3, p.y + az.y * s - ax.y * s / 3, p.z + az.z * s - ax.z * s / 3, col);
     }
-
+    // 计算两个向量的叉积。
     public void Vcross(ref RcVec3f dest, RcVec3f v1, RcVec3f v2)
     {
         dest.x = v1.y * v2.z - v1.z * v2.y;
         dest.y = v1.z * v2.x - v1.x * v2.z;
         dest.z = v1.x * v2.y - v1.y * v2.x;
     }
-
+    // 归一化向量。
     public void Vnormalize(ref RcVec3f v)
     {
         float d = (float)(1.0f / Math.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
@@ -509,14 +511,14 @@ public class DebugDraw
         v.y *= d;
         v.z *= d;
     }
-
+    // 计算两个向量的差。
     public void Vsub(ref RcVec3f dest, RcVec3f v1, RcVec3f v2)
     {
         dest.x = v1.x - v2.x;
         dest.y = v1.y - v2.y;
         dest.z = v1.z - v2.z;
     }
-
+    // 计算两个向量的距离平方。
     public float VdistSqr(RcVec3f v1, RcVec3f v2)
     {
         float x = v1.x - v2.x;
@@ -532,7 +534,7 @@ public class DebugDraw
 //            return DuIntToCol(area, 255);
 //        }
 //    }
-
+    // 根据区域类型返回相应的颜色。
     public static int AreaToCol(int area)
     {
         switch (area)
@@ -561,12 +563,12 @@ public class DebugDraw
                 return DuRGBA(255, 0, 0, 255);
         }
     }
-
+    // 将RGBA颜色分量合并为一个整数。
     public static int DuRGBA(int r, int g, int b, int a)
     {
         return (r) | (g << 8) | (b << 16) | (a << 24);
     }
-
+    // 插值两个颜色。
     public static int DuLerpCol(int ca, int cb, int u)
     {
         int ra = ca & 0xff;
@@ -589,7 +591,7 @@ public class DebugDraw
     {
         return (a & (1 << b)) >>> b;
     }
-
+    // 将整数转换为颜色。
     public static int DuIntToCol(int i, int a)
     {
         int r = Bit(i, 1) + Bit(i, 3) * 2 + 1;
@@ -597,7 +599,7 @@ public class DebugDraw
         int b = Bit(i, 0) + Bit(i, 5) * 2 + 1;
         return DuRGBA(r * 63, g * 63, b * 63, a);
     }
-
+    // 计算盒子的颜色。
     public static void DuCalcBoxColors(int[] colors, int colTop, int colSide)
     {
         colors[0] = DuMultCol(colTop, 250);
@@ -607,7 +609,7 @@ public class DebugDraw
         colors[4] = DuMultCol(colSide, 217);
         colors[5] = DuMultCol(colSide, 217);
     }
-
+    // 将颜色乘以一个系数。
     public static int DuMultCol(int col, int d)
     {
         int r = col & 0xff;
@@ -616,18 +618,18 @@ public class DebugDraw
         int a = (col >> 24) & 0xff;
         return DuRGBA((r * d) >> 8, (g * d) >> 8, (b * d) >> 8, a);
     }
-
+    // 设置颜色的透明度。
     public static int DuTransCol(int c, int a)
     {
         return (a << 24) | (c & 0x00ffffff);
     }
-
+    // 设置颜色的透明度。
     public static int DuDarkenCol(int col)
     {
         return (int)((uint)((col >> 1) & 0x007f7f7f) | (col & 0xff000000));
     }
 
-
+    // 计算投影矩阵并更新视锥体。
     public RcMatrix4x4f ProjectionMatrix(float fovy, float aspect, float near, float far)
     {
         GLU.GlhPerspectivef2(ref _projectionMatrix, fovy, aspect, near, far);
@@ -635,7 +637,7 @@ public class DebugDraw
         UpdateFrustum();
         return _projectionMatrix;
     }
-
+    // 计算视图矩阵并更新视锥体。
     public RcMatrix4x4f ViewMatrix(RcVec3f cameraPos, float[] cameraEulers)
     {
         var rx = RcMatrix4x4f.CreateFromRotate(cameraEulers[0], 1, 0, 0);
@@ -652,8 +654,8 @@ public class DebugDraw
         UpdateFrustum();
         return _viewMatrix;
     }
-
-
+    
+ 
     private readonly float[][] frustumPlanes =
     {
         new[] { 0f, 0f, 0f, 0f },
@@ -663,7 +665,7 @@ public class DebugDraw
         new[] { 0f, 0f, 0f, 0f },
         new[] { 0f, 0f, 0f, 0f },
     };
-
+    // 更新视锥体的平面。
     private void UpdateFrustum()
     {
         var vpm = RcMatrix4x4f.Mul(ref _projectionMatrix, ref _viewMatrix);
@@ -674,7 +676,7 @@ public class DebugDraw
         NormalizePlane(vpm.M14 + vpm.M13, vpm.M24 + vpm.M23, vpm.M34 + vpm.M33, vpm.M44 + vpm.M43, ref frustumPlanes[4]); // near
         NormalizePlane(vpm.M14 - vpm.M13, vpm.M24 - vpm.M23, vpm.M34 - vpm.M33, vpm.M44 - vpm.M43, ref frustumPlanes[5]); // far
     }
-
+    // 归一化平面。
     private void NormalizePlane(float px, float py, float pz, float pw, ref float[] plane)
     {
         float length = (float)Math.Sqrt(px * px + py * py + pz * pz);
@@ -693,6 +695,7 @@ public class DebugDraw
         plane[3] = pw;
     }
 
+    // （两个重载版本）：测试包围盒是否在视锥体内。
     public bool FrustumTest(float[] bounds)
     {
         foreach (float[] plane in frustumPlanes)

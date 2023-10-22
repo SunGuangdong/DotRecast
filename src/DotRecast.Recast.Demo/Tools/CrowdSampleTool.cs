@@ -34,19 +34,25 @@ using static DotRecast.Recast.Demo.Draw.DebugDraw;
 using static DotRecast.Recast.Demo.Draw.DebugDrawPrimitives;
 
 namespace DotRecast.Recast.Demo.Tools;
-
+    
+/// <summary>
+/// 这个类主要用于处理和渲染导航网格中的智能体。它使用RcCrowdTool类来执行智能体相关操作，如设置、更新和分析智能体。
+/// 类中的方法允许用户通过ImGui库提供的UI控件调整智能体参数和配置。当智能体发生变化时，HandleRender方法负责渲染它们。
+/// </summary>
 public class CrowdSampleTool : ISampleTool
 {
+    // 静态的ILogger实例，用于记录日志。
     private static readonly ILogger Logger = Log.ForContext<CrowdSampleTool>();
-
+    // DemoSample实例，表示样本数据。
     private DemoSample _sample;
+    // RcCrowdTool实例，用于处理智能体相关操作。
     private readonly RcCrowdTool _tool;
-
+    // DtNavMesh实例，表示导航网格。
     private DtNavMesh m_nav;
-
+    // RcCrowdToolMode枚举，表示当前工具模式。
     private RcCrowdToolMode m_mode = RcCrowdToolMode.CREATE;
     private int m_modeIdx = RcCrowdToolMode.CREATE.Idx;
-
+    // 各种与ImGui相关的字段，用于管理用户界面。
     private int _expandSelectedDebugDraw = 1;
     private bool _showCorners = true;
     private bool _showCollisionSegments = true;
@@ -66,7 +72,7 @@ public class CrowdSampleTool : ISampleTool
     {
         _tool = new();
     }
-
+    // 使用ImGui库呈现和调整工具参数。这个方法使用ImGui库创建UI控件，允许用户调整智能体的参数和配置。
     public void Layout()
     {
         ImGui.Text($"Crowd Tool Mode");
@@ -130,7 +136,8 @@ public class CrowdSampleTool : ISampleTool
         ImGui.Checkbox("Show Nodes", ref _showNodes);
         ImGui.Text($"Update Time: {_tool.GetCrowdUpdateTime()} ms");
     }
-
+    
+    // 渲染智能体。这个方法负责在智能体发生变化时渲染它们。
     public void HandleRender(NavMeshRenderer renderer)
     {
         RecastDebugDraw dd = renderer.GetDebugDraw();
@@ -448,17 +455,18 @@ public class CrowdSampleTool : ISampleTool
 
         dd.DepthMask(true);
     }
-
+    
+    // 返回_tool实例。这个方法返回_tool实例，它是一个RcCrowdTool实例，用于处理智能体相关操作。
     public IRcToolable GetTool()
     {
         return _tool;
-    }
-
+    }   
+    // 返回_tool实例。这个方法返回_tool实例，它是一个RcCrowdTool实例，用于处理智能体相关操作。
     public void SetSample(DemoSample sample)
     {
         _sample = sample;
     }
-
+    // 处理样本更改事件。当样本发生变化时，这个方法会更新导航网格和智能体参数。
     public void OnSampleChanged()
     {
         var geom = _sample.GetInputGeom();
@@ -471,7 +479,7 @@ public class CrowdSampleTool : ISampleTool
             _tool.Setup(settings.agentRadius, navMesh);
         }
     }
-
+    // 处理点击事件。这个方法根据当前工具模式（创建、移动目标、选择、切换多边形等）处理用户的点击事件。
     public void HandleClick(RcVec3f s, RcVec3f p, bool shift)
     {
         var crowd = _tool.GetCrowd();
@@ -529,13 +537,13 @@ public class CrowdSampleTool : ISampleTool
         }
     }
 
-
+    // 处理点击事件。这个方法根据当前工具模式（创建、移动目标、选择、切换多边形等）处理用户的点击事件。
     public void HandleUpdate(float dt)
     {
         _tool.Update(dt);
     }
 
-
+    // 处理射线点击事件（未实现）。这个方法在当前版本中没有实现，可能会在未来的版本中实现射线点击事件的处理。
     public void HandleClickRay(RcVec3f start, RcVec3f direction, bool shift)
     {
     }

@@ -26,15 +26,25 @@ using DotRecast.Recast.Toolset.Geom;
 
 namespace DotRecast.Recast.Demo
 {
+    /// <summary>
+    /// 它用于在3D环境中处理导航网格相关的信息。
+    /// </summary>
     public class DemoSample
     {
+        //存储DemoInputGeomProvider对象，该对象提供了与导航网格相关的几何信息。
         private DemoInputGeomProvider _geom;
+        // 存储DtNavMesh对象，表示导航网格。
         private DtNavMesh _navMesh;
+        // 存储DtNavMeshQuery对象，用于查询导航网格。
         private DtNavMeshQuery _navMeshQuery;
+        // 存储RcNavMeshBuildSettings对象，表示导航网格的构建设置。
         private readonly RcNavMeshBuildSettings _settings;
+        // 存储一个RcBuilderResult对象列表，表示导航网格构建的结果。
         private IList<RcBuilderResult> _recastResults;
+        // 表示导航网格是否已更改。
         private bool _changed;
 
+        // 构造函数，用于初始化DemoSample对象。
         public DemoSample(DemoInputGeomProvider geom, IList<RcBuilderResult> recastResults, DtNavMesh navMesh)
         {
             _geom = geom;
@@ -46,6 +56,7 @@ namespace DotRecast.Recast.Demo
             _changed = true;
         }
 
+        // 此方法用于设置DtNavMeshQuery对象。
         private void SetQuery(DtNavMesh navMesh)
         {
             _navMeshQuery = navMesh != null ? new DtNavMeshQuery(navMesh) : null;
@@ -86,6 +97,13 @@ namespace DotRecast.Recast.Demo
             _changed = changed;
         }
 
+        /// <summary>
+        /// 此方法用于更新导航网格相关的信息。它接受一个DemoInputGeomProvider对象、一个RcBuilderResult对象列表和一个DtNavMesh对象作为参数。
+        /// </summary>
+        /// <param name="geom"></param>
+        /// <param name="recastResults"></param>
+        /// <param name="navMesh"></param>
+        /// <returns></returns>
         public void Update(DemoInputGeomProvider geom, IList<RcBuilderResult> recastResults, DtNavMesh navMesh)
         {
             _geom = geom;

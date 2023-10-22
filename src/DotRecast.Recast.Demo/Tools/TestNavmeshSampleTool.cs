@@ -13,6 +13,9 @@ using static DotRecast.Recast.Demo.Draw.DebugDrawPrimitives;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 这个类用于在3D环境中测试导航网格。
+/// </summary>
 public class TestNavmeshSampleTool : ISampleTool
 {
     private static readonly ILogger Logger = Log.ForContext<TestNavmeshSampleTool>();
@@ -23,22 +26,27 @@ public class TestNavmeshSampleTool : ISampleTool
     private readonly RcTestNavMeshTool _tool;
 
     // mode select
+    // 表示当前工具的模式。
     private RcTestNavmeshToolMode _mode = RcTestNavmeshToolMode.Values[RcTestNavmeshToolMode.PATHFIND_FOLLOW.Idx];
 
     // flags
+    // 表示包含和排除的多边形标志。
     private int _includeFlags = SampleAreaModifications.SAMPLE_POLYFLAGS_ALL;
     private int _excludeFlags = 0;
 
+    // 表示是否启用射线投射。
     private bool _enableRaycast = true;
 
     // for pathfind straight mode
+    // 表示直线路径选项。
     private int _straightPathOption;
 
     // for random point in circle mode
+    // 表示是否通过圆形约束随机点。
     private int _randomPointCount = 300;
     private bool _constrainByCircle;
 
-    // 
+    // 其他字段用于存储路径查询、障碍物、起始点和终点等相关信息。
     private bool m_sposSet;
     private long m_startRef;
     private RcVec3f m_spos;
@@ -77,7 +85,7 @@ public class TestNavmeshSampleTool : ISampleTool
             new float[] { 1f, 1f, 1f, 1f, 2f, 1.5f }
         );
     }
-
+    // 此方法用于创建和显示工具的UI布局。它包含了ImGui单选按钮，用于选择工具的模式和设置选项。
     public void Layout()
     {
         var prevMode = _mode;
@@ -167,7 +175,7 @@ public class TestNavmeshSampleTool : ISampleTool
             Recalc();
         }
     }
-
+    // 此方法用于在场景中渲染导航网格和路径。它使用RecastDebugDraw类来执行实际的渲染操作
     public void HandleRender(NavMeshRenderer renderer)
     {
         RecastDebugDraw dd = renderer.GetDebugDraw();
@@ -573,7 +581,7 @@ public class TestNavmeshSampleTool : ISampleTool
             dd.DepthMask(true);
         }
     }
-
+    // 此方法用于绘制代理（游戏中的角色）在导航网格上的位置。它使用RecastDebugDraw类来执行实际的绘制操作。
     private void DrawAgent(RecastDebugDraw dd, RcVec3f pos, int col)
     {
         var settings = _sample.GetSettings();
@@ -611,7 +619,7 @@ public class TestNavmeshSampleTool : ISampleTool
         // ..
     }
 
-
+    // 此方法用于处理鼠标点击事件。根据当前工具的模式，它会执行不同的操作，如设置起始点和终点、添加障碍物等。
     public void HandleClick(RcVec3f s, RcVec3f p, bool shift)
     {
         if (shift)
@@ -628,7 +636,7 @@ public class TestNavmeshSampleTool : ISampleTool
         Recalc();
     }
 
-
+    // 此方法用于重新计算路径和障碍物等信息。
     private void Recalc()
     {
         var geom = _sample.GetInputGeom();
@@ -701,7 +709,7 @@ public class TestNavmeshSampleTool : ISampleTool
         }
     }
 
-
+    // 此方法用于处理工具的更新操作，但在这个具体实现中，它没有做任何操作。
     public void HandleUpdate(float dt)
     {
         if (_mode == RcTestNavmeshToolMode.PATHFIND_SLICED)

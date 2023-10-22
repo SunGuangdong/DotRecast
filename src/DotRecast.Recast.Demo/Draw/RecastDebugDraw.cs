@@ -27,16 +27,21 @@ using Silk.NET.OpenGL;
 
 namespace DotRecast.Recast.Demo.Draw;
 
+/// <summary>
+/// 它继承自DebugDraw类。这个类的主要目的是提供一组方法来绘制导航网格的不同部分，如三角形网格、边界、离网连接等。
+/// </summary>
 public class RecastDebugDraw : DebugDraw
 {
     public static readonly int DRAWNAVMESH_OFFMESHCONS = 0x01;
     public static readonly int DRAWNAVMESH_CLOSEDLIST = 0x02;
     public static readonly int DRAWNAVMESH_COLOR_TILES = 0x04;
 
+    //构造函数：接收一个GL类型的对象，用于存储OpenGL绘制任务的引用。
     public RecastDebugDraw(GL gl) : base(gl)
     {
     }
 
+    // 根据给定的顶点、三角形索引、法线、可行走斜率和纹理缩放绘制三角形网格。
     public void DebugDrawTriMeshSlope(float[] verts, int[] tris, float[] normals, float walkableSlopeAngle,
         float texScale)
     {
@@ -99,7 +104,7 @@ public class RecastDebugDraw : DebugDraw
 
         Texture(false);
     }
-
+    // 根据给定的DtNavMesh和DtNavMeshQuery对象以及绘制标志，绘制导航网格。这个方法遍历所有的网格瓦片并调用DrawMeshTile方法进行绘制。
     public void DebugDrawNavMeshWithClosedList(DtNavMesh mesh, DtNavMeshQuery query, int flags)
     {
         DtNavMeshQuery q = (flags & DRAWNAVMESH_CLOSEDLIST) != 0 ? query : null;
@@ -112,7 +117,7 @@ public class RecastDebugDraw : DebugDraw
             }
         }
     }
-
+    // 根据给定的DtNavMesh、DtNavMeshQuery、DtMeshTile对象以及绘制标志，绘制一个导航网格瓦片。这个方法绘制瓦片的多边形、边界、离网连接等。
     private void DrawMeshTile(DtNavMesh mesh, DtNavMeshQuery query, DtMeshTile tile, int flags)
     {
         long @base = mesh.GetPolyRefBase(tile);
@@ -250,7 +255,7 @@ public class RecastDebugDraw : DebugDraw
 
         DepthMask(true);
     }
-
+    // 根据给定的DtMeshTile对象、多边形索引和颜色，绘制一个多边形。
     private void DrawPoly(DtMeshTile tile, int index, int col)
     {
         DtPoly p = tile.data.polys[index];
@@ -294,7 +299,7 @@ public class RecastDebugDraw : DebugDraw
             }
         }
     }
-
+    // 根据给定的DtMeshTile对象、颜色、线宽和是否绘制内部边界的标志，绘制多边形的边界。
     void DrawPolyBoundaries(DtMeshTile tile, int col, float linew, bool inner)
     {
         float thr = 0.01f * 0.01f;
@@ -421,7 +426,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 计算一个点到一条线段的距离的平方。
     static float DistancePtLine2d(RcVec3f pt, RcVec3f p, RcVec3f q)
     {
         float pqx = q.x - p.x;
@@ -439,7 +444,7 @@ public class RecastDebugDraw : DebugDraw
         dz = p.z + t * pqz - pt.z;
         return dx * dx + dz * dz;
     }
-
+    // 根据给定的DtNavMesh对象，绘制导航网格的包围体层次树。这个方法遍历所有的网格瓦片并调用DrawMeshTileBVTree方法进行绘制。
     public void DebugDrawNavMeshBVTree(DtNavMesh mesh)
     {
         for (int i = 0; i < mesh.GetMaxTiles(); ++i)
@@ -451,7 +456,7 @@ public class RecastDebugDraw : DebugDraw
             }
         }
     }
-
+    // 根据给定的DtMeshTile对象，绘制导航网格的包围体层次树。这个方法遍历所有的网格瓦片并调用AppendBoxWire方法进行绘制。
     private void DrawMeshTileBVTree(DtMeshTile tile)
     {
         // Draw BV nodes.
@@ -473,7 +478,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcCompactHeightfield对象，绘制导航网格的紧凑高度场。这个方法遍历所有的网格瓦片并调用Vertex方法进行绘制。
     public void DebugDrawCompactHeightfieldSolid(RcCompactHeightfield chf)
     {
         float cs = chf.cs;
@@ -519,7 +524,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcContourSet对象，绘制导航网格的区域连接。这个方法遍历所有的轮廓并调用AppendArc方法进行绘制。
     public void DebugDrawRegionConnections(RcContourSet cset)
     {
         float alpha = 1f;
@@ -569,7 +574,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 计算给定轮廓的中心点。
     private RcVec3f GetContourCenter(RcContour cont, RcVec3f orig, float cs, float ch)
     {
         RcVec3f center = new RcVec3f();
@@ -598,7 +603,7 @@ public class RecastDebugDraw : DebugDraw
         center.z += orig.z;
         return center;
     }
-
+    // 从给定的RcContourSet对象中查找具有指定区域编号的轮廓。
     private RcContour FindContourFromSet(RcContourSet cset, int reg)
     {
         for (int i = 0; i < cset.conts.Count; ++i)
@@ -611,7 +616,7 @@ public class RecastDebugDraw : DebugDraw
 
         return null;
     }
-
+    // 从给定的RcContourSet对象中查找具有指定区域编号的轮廓。
     public void DebugDrawRawContours(RcContourSet cset, float alpha)
     {
         RcVec3f orig = cset.bmin;
@@ -686,7 +691,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 从给定的RcContourSet对象中查找具有指定区域编号的轮廓。
     public void DebugDrawContours(RcContourSet cset)
     {
         float alpha = 1f;
@@ -764,7 +769,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcHeightfield对象，绘制导航网格的高度场。这个方法遍历所有的网格瓦片并调用AppendBox方法进行绘制。
     public void DebugDrawHeightfieldSolid(RcHeightfield hf)
     {
         if (!FrustumTest(hf.bmin, hf.bmax))
@@ -801,7 +806,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcHeightfield对象，绘制导航网格的可行走高度场。这个方法遍历所有的网格瓦片并调用AppendBox方法进行绘制。
     public void DebugDrawHeightfieldWalkable(RcHeightfield hf)
     {
         RcVec3f orig = hf.bmin;
@@ -846,7 +851,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcCompactHeightfield对象，绘制导航网格的紧凑高度场区域。这个方法遍历所有的网格瓦片并调用Vertex方法进行绘制。
     public void DebugDrawCompactHeightfieldRegions(RcCompactHeightfield chf)
     {
         float cs = chf.cs;
@@ -886,7 +891,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcCompactHeightfield对象，绘制导航网格的紧凑高度场距离。这个方法遍历所有的网格瓦片并调用Vertex方法进行绘制。
     public void DebugDrawCompactHeightfieldDistance(RcCompactHeightfield chf)
     {
         if (chf.dist == null)
@@ -931,7 +936,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcPolyMesh对象，绘制导航网格的多边形网格。这个方法遍历所有的多边形，并根据其区域和顶点信息调用Vertex方法进行绘制。
     public void DebugDrawPolyMesh(RcPolyMesh mesh)
     {
         int nvp = mesh.nvp;
@@ -1073,7 +1078,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的RcPolyMeshDetail对象，绘制导航网格的详细多边形网格。这个方法遍历所有的详细多边形，并根据其顶点和三角形信息调用Vertex方法进行绘制。
     public void DebugDrawPolyMeshDetail(RcPolyMeshDetail dmesh)
     {
         Begin(DebugDrawPrimitives.TRIS);
@@ -1193,7 +1198,7 @@ public class RecastDebugDraw : DebugDraw
 
         End();
     }
-
+    // 根据给定的DtNavMeshQuery对象，绘制导航网格的节点。这个方法遍历所有的节点，并调用Vertex方法进行绘制。
     public void DebugDrawNavMeshNodes(DtNavMeshQuery query)
     {
         DtNodePool pool = query.GetNodePool();
@@ -1246,7 +1251,7 @@ public class RecastDebugDraw : DebugDraw
             End();
         }
     }
-
+    // 根据给定的DtNavMeshQuery对象，绘制导航网格的节点。这个方法遍历所有的节点，并调用Vertex方法进行绘制。
     public void DebugDrawNavMeshPolysWithFlags(DtNavMesh mesh, int polyFlags, int col)
     {
         for (int i = 0; i < mesh.GetMaxTiles(); ++i)
@@ -1271,7 +1276,7 @@ public class RecastDebugDraw : DebugDraw
             }
         }
     }
-
+    // 根据给定的DtNavMeshQuery对象，绘制导航网格的节点。这个方法遍历所有的节点，并调用Vertex方法进行绘制。
     public void DebugDrawNavMeshPoly(DtNavMesh mesh, long refs, int col)
     {
         if (refs == 0)
@@ -1311,7 +1316,7 @@ public class RecastDebugDraw : DebugDraw
 
         DepthMask(true);
     }
-
+    // 根据给定的DtNavMesh对象，绘制导航网格的门户。这个方法遍历所有的网格瓦片，并调用DrawMeshTilePortal方法进行绘制。
     public void DebugDrawNavMeshPortals(DtNavMesh mesh)
     {
         for (int i = 0; i < mesh.GetMaxTiles(); ++i)
@@ -1323,7 +1328,7 @@ public class RecastDebugDraw : DebugDraw
             }
         }
     }
-
+    // 根据给定的DtMeshTile对象，绘制导航网格的门户。这个方法遍历所有的多边形，并根据其邻接信息调用Vertex方法进行绘制。
     private void DrawMeshTilePortal(DtMeshTile tile)
     {
         float padx = 0.04f;

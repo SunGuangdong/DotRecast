@@ -6,8 +6,18 @@ using DotRecast.Recast.Toolset.Gizmos;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 一个静态类，用于渲染不同类型的几何体。
+/// 这个类的主要目的是提供一个通用的渲染接口，它可以处理不同类型的几何体。它使用RecastDebugDraw类来执行实际的渲染操作。
+/// </summary>
 public static class GizmoRenderer
 {
+    /// <summary>
+    /// 这是一个通用的渲染方法，根据传入的gizmo类型调用相应的渲染方法。例如，如果gizmo是RcBoxGizmo类型，它将调用RenderBox方法。
+    /// </summary>
+    /// <param name="dd"></param>
+    /// <param name="gizmo"></param>
+    /// <returns></returns>
     public static void Render(RecastDebugDraw dd, IRcGizmoMeshFilter gizmo)
     {
         if (gizmo is RcBoxGizmo box)
@@ -35,7 +45,7 @@ public static class GizmoRenderer
             RenderComposite(dd, composite);
         }
     }
-
+    // 根据三角形的法线计算颜色。这个方法计算三角形的法线并根据法线方向生成一个颜色值。
     public static int GetColorByNormal(float[] vertices, int v0, int v1, int v2)
     {
         RcVec3f e0 = new RcVec3f();
@@ -59,7 +69,7 @@ public static class GizmoRenderer
         );
         return col;
     }
-
+    // 渲染一个RcBoxGizmo类型的几何体。
     public static void RenderBox(RecastDebugDraw debugDraw, RcBoxGizmo box)
     {
         var trX = RcVec3f.Of(box.halfEdges[0].x, box.halfEdges[1].x, box.halfEdges[2].x);
@@ -95,7 +105,7 @@ public static class GizmoRenderer
 
         debugDraw.End();
     }
-
+    // 渲染一个RcBoxGizmo类型的几何体。
     public static void RenderCapsule(RecastDebugDraw debugDraw, RcCapsuleGizmo capsule)
     {
         debugDraw.Begin(DebugDrawPrimitives.TRIS);
@@ -113,7 +123,7 @@ public static class GizmoRenderer
 
         debugDraw.End();
     }
-
+    // 渲染一个RcCylinderGizmo类型的几何体。
     public static void RenderCylinder(RecastDebugDraw debugDraw, RcCylinderGizmo cylinder)
     {
         debugDraw.Begin(DebugDrawPrimitives.TRIS);
@@ -131,7 +141,7 @@ public static class GizmoRenderer
 
         debugDraw.End();
     }
-
+    // 渲染一个RcSphereGizmo类型的几何体。
     public static void RenderSphere(RecastDebugDraw debugDraw, RcSphereGizmo sphere)
     {
         debugDraw.Begin(DebugDrawPrimitives.TRIS);
@@ -154,7 +164,7 @@ public static class GizmoRenderer
 
         debugDraw.End();
     }
-
+    // 渲染一个RcTrimeshGizmo类型的几何体。
     public static void RenderTrimesh(RecastDebugDraw debugDraw, RcTrimeshGizmo trimesh)
     {
         debugDraw.Begin(DebugDrawPrimitives.TRIS);
@@ -171,7 +181,7 @@ public static class GizmoRenderer
 
         debugDraw.End();
     }
-
+    // 渲染一个RcCompositeGizmo类型的几何体。这个方法遍历composite中的所有gizmoMeshes并调用Render方法进行渲染。
     public static void RenderComposite(RecastDebugDraw debugDraw, RcCompositeGizmo composite)
     {
         composite.gizmoMeshes.ForEach(g => Render(debugDraw, g));

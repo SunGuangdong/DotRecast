@@ -5,35 +5,49 @@ using DotRecast.Core;
 
 namespace DotRecast.Recast.Demo.Draw;
 
+// 它实现了IOpenGLDraw接口。这个类使用了OpenGL库，用于处理OpenGL中的绘制任务。
 public class ModernOpenGLDraw : IOpenGLDraw
 {
+    // 一个GL类型的对象，用于存储OpenGL库的引用。
     private GL _gl;
+    // 一个uint类型，表示OpenGL着色器程序的ID。
     private uint program;
+    // 整型变量，表示着色器中uniform变量的位置。
     private int uniformTexture;
     private int uniformProjectionMatrix;
-    private uint vbo;
-    private uint ebo;
-    private uint vao;
-    private DebugDrawPrimitives currentPrim;
-    private float fogStart;
-    private float fogEnd;
-    private bool fogEnabled;
     private int uniformViewMatrix;
-    private readonly ArrayBuffer<OpenGLVertex> vertices = new();
-    private readonly ArrayBuffer<int> elements = new();
-    private GLCheckerTexture _texture;
-    private readonly float[] _viewMatrix = new float[16];
-    private readonly float[] _projectionMatrix = new float[16];
     private int uniformUseTexture;
     private int uniformFog;
     private int uniformFogStart;
     private int uniformFogEnd;
+    // uint类型，分别表示顶点缓冲区对象、索引缓冲区对象和顶点数组对象的ID。
+    private uint vbo;
+    private uint ebo;
+    private uint vao;
+    // DebugDrawPrimitives类型，表示当前绘制任务的图元类型。
+    private DebugDrawPrimitives currentPrim;
+    // 浮点数，表示雾效果的开始和结束距离。
+    private float fogStart;
+    private float fogEnd;
+    // 布尔值，表示是否启用雾效果。
+    private bool fogEnabled;
+    // 用于存储顶点数据。
+    private readonly ArrayBuffer<OpenGLVertex> vertices = new();
+    // 用于存储索引数据。
+    private readonly ArrayBuffer<int> elements = new();
+    // 表示当前绑定的纹理。
+    private GLCheckerTexture _texture;
+    // 表示视图矩阵和投影矩阵。
+    private readonly float[] _viewMatrix = new float[16];
+    private readonly float[] _projectionMatrix = new float[16];
 
+    // 接收一个GL类型的对象，用于存储OpenGL库的引用。
     public ModernOpenGLDraw(GL gl)
     {
         _gl = gl;
     }
 
+    // 初始化OpenGL环境，包括创建和编译着色器、设置顶点属性指针、创建缓冲区等。
     public unsafe void Init()
     {
         string SHADER_VERSION = "#version 400\n";
@@ -151,7 +165,7 @@ public class ModernOpenGLDraw : IOpenGLDraw
         _gl.BindBuffer(GLEnum.ArrayBuffer, 0);
         _gl.BindBuffer(GLEnum.ElementArrayBuffer, 0);
     }
-
+    // 清除绘制内容，设置清除颜色和深度缓冲，启用混合、深度测试和面剔除等功能。
     public void Clear()
     {
         _gl.ClearColor(0.3f, 0.3f, 0.32f, 1.0f);
@@ -162,7 +176,7 @@ public class ModernOpenGLDraw : IOpenGLDraw
         _gl.Enable(GLEnum.DepthTest);
         _gl.Enable(GLEnum.CullFace);
     }
-
+    // 开始一个绘制任务，需要指定绘制图元类型（DebugDrawPrimitives）和大小（size）。
     public void Begin(DebugDrawPrimitives prim, float size)
     {
         currentPrim = prim;
@@ -170,7 +184,7 @@ public class ModernOpenGLDraw : IOpenGLDraw
         _gl.LineWidth(size);
         _gl.PointSize(size);
     }
-
+    // 结束一个绘制任务，将顶点数据上传到GPU，绘制图形。
     public unsafe void End()
     {
         if (0 >= vertices.Count)
@@ -274,7 +288,7 @@ public class ModernOpenGLDraw : IOpenGLDraw
         _gl.LineWidth(1.0f);
         _gl.PointSize(1.0f);
     }
-
+    // 结束一个绘制任务，将顶点数据上传到GPU，绘制图形。
     public void Vertex(float x, float y, float z, int color)
     {
         vertices.Add(new OpenGLVertex(x, y, z, color));
@@ -300,12 +314,12 @@ public class ModernOpenGLDraw : IOpenGLDraw
     {
         vertices.Add(new OpenGLVertex(x, y, z, u, v, color));
     }
-
+    // 控制深度缓冲的写入。接收一个布尔值（state）来开启或关闭深度缓冲的写入。
     public void DepthMask(bool state)
     {
         _gl.DepthMask(state);
     }
-
+    // 用于绑定或解绑一个GLCheckerTexture纹理。接收一个GLCheckerTexture对象（g_tex）和一个布尔值（state）来表示是否绑定纹理。
     public void Texture(GLCheckerTexture g_tex, bool state)
     {
         _texture = state ? g_tex : null;
@@ -314,17 +328,17 @@ public class ModernOpenGLDraw : IOpenGLDraw
             _texture.Bind();
         }
     }
-
+    // 用于绑定或解绑一个GLCheckerTexture纹理。接收一个GLCheckerTexture对象（g_tex）和一个布尔值（state）来表示是否绑定纹理。
     public void ProjectionMatrix(ref RcMatrix4x4f projectionMatrix)
     {
         projectionMatrix.CopyTo(_projectionMatrix);
     }
-
+    // 设置视图矩阵。接收一个RcMatrix4x4f类型的视图矩阵（viewMatrix）。
     public void ViewMatrix(ref RcMatrix4x4f viewMatrix)
     {
         viewMatrix.CopyTo(_viewMatrix);
     }
-
+    // 有两个重载版本，用于控制雾效果。一个接收布尔值（state）来开启或关闭雾效果，另一个接收两个浮点数（start, end）来设置雾的开始和结束距离。
     public void Fog(float start, float end)
     {
         fogStart = start;

@@ -15,6 +15,11 @@ public static class Program
         StartDemo();
     }
 
+/// <summary>
+/// 这个方法用于初始化日志记录器。它使用Serilog库创建一个新的日志记录器，并配置了不同的输出接收器。
+/// 输出模板定义了日志消息的格式。日志记录器将异步地将日志消息发送到以下接收器：
+/// </summary>
+/// <returns></returns>
     private static void InitializeLogger()
     {
         var format = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj} [{ThreadName}:{ThreadId}]{NewLine}{Exception}";
@@ -34,7 +39,10 @@ public static class Program
             )
             .CreateLogger();
     }
-
+    /// <summary>
+    /// 这个方法用于设置当前工作目录。程序首先在"resources/dungeon.obj"文件中搜索，如果找到该文件，它将设置工作目录为包含该文件的目录。
+    /// </summary>
+    /// <returns></returns>
     private static void InitializeWorkingDirectory()
     {
         var path = RcDirectory.SearchDirectory("resources/dungeon.obj");

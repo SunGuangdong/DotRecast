@@ -22,16 +22,21 @@ using Silk.NET.OpenGL;
 
 namespace DotRecast.Recast.Demo.Draw;
 
+/// <summary>
+/// 用于在OpenGL中创建和绑定一个带有棋盘纹理的2D纹理
+/// </summary>
 public class GLCheckerTexture
 {
     private readonly GL _gl;
     private uint m_texId;
 
+    // 构造函数：接收一个GL对象作为参数，用于执行OpenGL操作
     public GLCheckerTexture(GL gl)
     {
         _gl = gl;
     }
 
+    // 释放纹理资源。如果纹理ID不为0（即已创建纹理），则调用_gl.DeleteTextures方法删除纹理。
     public void Release()
     {
         if (m_texId != 0)
@@ -40,6 +45,8 @@ public class GLCheckerTexture
         }
     }
 
+    // 绑定纹理。如果纹理ID为0（即未创建纹理），则创建一个带有棋盘纹理的2D纹理，并设置纹理参数。
+    // 如果纹理已经创建，则直接绑定纹理。创建纹理时，使用了多级纹理（Mipmap），这可以提高纹理的渲染效果。
     public void Bind()
     {
         if (m_texId == 0)

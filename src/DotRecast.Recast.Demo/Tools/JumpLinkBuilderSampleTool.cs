@@ -28,11 +28,21 @@ using static DotRecast.Recast.Demo.Draw.DebugDrawPrimitives;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+//它是一个工具类，用于构建和显示跳跃连接。
 public class JumpLinkBuilderSampleTool : ISampleTool
 {
     private static readonly ILogger Logger = Log.ForContext<JumpLinkBuilderSampleTool>();
     private DemoSample _sample;
 
+    /*
+     * DRAW_WALKABLE_SURFACE：表示环境中的可行走表面。
+        DRAW_WALKABLE_BORDER：表示环境中的可行走边界。
+        DRAW_SELECTED_EDGE：表示环境中当前选定的边。
+        DRAW_ANIM_TRAJECTORY：表示跳跃连接的动画轨迹。
+        DRAW_LAND_SAMPLES：表示跳跃连接的着陆样本。
+        DRAW_COLLISION_SLICES：表示跳跃连接的碰撞切片。
+        DRAW_ANNOTATIONS：表示跳跃连接的注释。
+     */
     public const int DRAW_WALKABLE_SURFACE = 1 << 0;
     public const int DRAW_WALKABLE_BORDER = 1 << 1;
     public const int DRAW_SELECTED_EDGE = 1 << 2;
@@ -40,7 +50,8 @@ public class JumpLinkBuilderSampleTool : ISampleTool
     public const int DRAW_LAND_SAMPLES = 1 << 4;
     public const int DRAW_COLLISION_SLICES = 1 << 5;
     public const int DRAW_ANNOTATIONS = 1 << 6;
-
+    
+    // _drawFlags变量使用按位或运算符初始化这些标志的组合。这意味着默认情况下，工具将渲染可行走表面、可行走边界、选定的边、动画轨迹、着陆样本和注释。
     private int _drawFlags = DRAW_WALKABLE_SURFACE | DRAW_WALKABLE_BORDER | DRAW_SELECTED_EDGE | DRAW_ANIM_TRAJECTORY | DRAW_LAND_SAMPLES | DRAW_ANNOTATIONS;
 
     private readonly RcJumpLinkBuilderTool _tool;
@@ -51,7 +62,7 @@ public class JumpLinkBuilderSampleTool : ISampleTool
         _tool = new();
         _cfg = new();
     }
-
+    // 这个方法用于创建和显示工具的UI布局。它包含了各种ImGui控件，如滑块、复选框和按钮，用于调整不同的参数和选项。
     public void Layout()
     {
         ImGui.Text("Options");
@@ -117,7 +128,7 @@ public class JumpLinkBuilderSampleTool : ISampleTool
         ImGui.CheckboxFlags("All Annotations", ref _drawFlags, DRAW_ANNOTATIONS);
         //option.flags = newFlags;
     }
-
+    // 这个方法用于在场景中渲染跳跃连接。它使用RecastDebugDraw类来执行实际的渲染操作。
     public void HandleRender(NavMeshRenderer renderer)
     {
         int col0 = DuLerpCol(DuRGBA(32, 255, 96, 255), DuRGBA(255, 255, 255, 255), 200);
@@ -382,7 +393,7 @@ public class JumpLinkBuilderSampleTool : ISampleTool
         dd.DepthMask(true);
     }
 
-
+    // 这个方法返回一个IRcToolable类型的对象，即_tool成员变量。
     public IRcToolable GetTool()
     {
         return _tool;

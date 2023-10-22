@@ -30,6 +30,9 @@ using static DotRecast.Recast.Demo.Draw.DebugDraw;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 用于在3D环境中添加、删除和显示离网连接。
+/// </summary>
 public class OffMeshConnectionSampleTool : ISampleTool
 {
     private static readonly ILogger Logger = Log.ForContext<OffMeshConnectionSampleTool>();
@@ -46,13 +49,14 @@ public class OffMeshConnectionSampleTool : ISampleTool
     {
         _tool = new();
     }
-
+    
+    // 此方法用于创建和显示工具的UI布局。它包含了ImGui单选按钮，用于选择离网连接的方向（单向或双向）。
     public void Layout()
     {
         ImGui.RadioButton("One Way", ref _bidir, 0);
         ImGui.RadioButton("Bidirectional", ref _bidir, 1);
     }
-
+    // 此方法用于在场景中渲染离网连接。它使用RecastDebugDraw类来执行实际的渲染操作。
     public void HandleRender(NavMeshRenderer renderer)
     {
         RecastDebugDraw dd = renderer.GetDebugDraw();

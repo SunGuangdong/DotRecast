@@ -9,6 +9,9 @@ using Serilog;
 
 namespace DotRecast.Recast.Demo.Tools;
 
+/// <summary>
+/// 用于在3D环境中添加、删除和显示障碍物。以下是类中的字段和方法的详细解释：
+/// </summary>
 public class ObstacleSampleTool : ISampleTool
 {
     private static readonly ILogger Logger = Log.ForContext<ObstacleSampleTool>();
@@ -21,6 +24,7 @@ public class ObstacleSampleTool : ISampleTool
         _tool = new(DtTileCacheCompressorFactory.Shared);
     }
 
+    // 此方法用于创建和显示工具的UI布局。它包含了各种ImGui控件，如按钮，用于构建瓦片缓存、添加和删除障碍物等。
     public void Layout()
     {
         if (ImGui.Button("Build Tile Cache"))
@@ -46,13 +50,13 @@ public class ObstacleSampleTool : ISampleTool
         ImGui.Text("Click LMB to create an obstacle.");
         ImGui.Text("Shift+LMB to remove an obstacle.");
     }
-
+    // 此方法用于在场景中渲染障碍物。它使用DrawObstacles方法来执行实际的渲染操作。
     public void HandleRender(NavMeshRenderer renderer)
     {
         DrawObstacles(renderer.GetDebugDraw());
     }
 
-
+    // 此方法使用RecastDebugDraw类在场景中绘制障碍物。
     private void DrawObstacles(RecastDebugDraw dd)
     {
         var tc = _tool.GetTileCache();
